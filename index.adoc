@@ -1,0 +1,108 @@
+= Web
+
+== Creation d'une librairie de conposants
+
+* Utilisnt-ils storybook ?
+* Ont-il une strategie de mise a jour de la librairie. Comme avec les schematics d'angular cli  
+
+== Accessibilité
+
+* Vérifier que toutes les images possèdent une alternative textuelle. 
+* Est-ce que le titre de l'application est mise à jour au fur et à mesure de la navigation
+** https://blogs.intuit.com/blog/2020/01/28/5-tips-for-making-your-app-accessible/
+* Est-ce que le titre principal de l'application utilise une balise `h1` ?
+* Est-ce que les niveaux de titres sont bien continus ?
+** https://blogs.intuit.com/blog/2020/01/28/5-tips-for-making-your-app-accessible/
+* Est-ce que tous les champs de formulaire ont une alternative textuelle
+* Est-ce que tous les liens possèdent un liens valides. 
+* Est ce que tous les elements clickables sont focusable au clavier
+* Utilisent-ils Axe-core pour tester ?
+* Utilisent-ils du code HTML sémantiques ?
+* Est-ce que le score sur Lighthouse est accepatable ?
+* Est-ce que le code HTML est valide ?
+
+== Sécurité
+
+* NPM propose nativement un outil permettant d'auditer les modules utilises par une application et ainsi vérifier si certains d'entre eux ont des failles de sécurité connues. 
+[source]
+----
+npm audit 
+----
+
+* Vous pouvez utiliser le module NPM nsecure pour recuperer des informations sur les modules utilisés. Pour cela, vous pouvez executer la commande suivante : 
+
+[source]
+----
+npx nsecure cwd
+----
+
+== Performance
+
+* Vérifier que les ressources statiques; sont servies compressées via un Gzip ou Brotli
+* Utilisation du link rel=preconnect pour faire la résolution DNS le plus tôt possible
+** https://css-tricks.com/using-relpreconnect-to-establish-network-connections-early-and-increase-performance/
+* Angular: Utiliser la stratégie `onPush`
+* Lazy loder des pages
+* Le FCP (First Contentful paint) doit étre inférieur à 2 secondes
+* Angular: Ne pas appeler des fonctions depuis les templates des composants
+* Angular: Utiliser `trackBy` pour la directive `ngFor`
+* Utiliser l'attribut loading=lazy pour les images ou iframe non visible a l'affichage de la page
+* Est-ce que le score sur Lighthouse est accepatable ?
+
+=== Utilisation de MomentJS
+
+Si l'application utilise MomentJS, cela pourra impacter la taille du bundle de l'application. Nous pouvons 
+proposer comme solution l'utilisation de l'API native INTL ou l'utilisation de la librairie Datefns. 
+
+Pour vérifier que cette librairie est présente, nous pouvons exécuter la commande suivante : 
+
+[source]
+----
+npm ls | grep moment
+----
+
+== Maintenabilité
+
+* Utilisent-ils une plateforme d'integration continue ?
+* Ont-ils Lighthosue dans leur solution d'IC ?
+* Ont-ils npm audt dans leur solution d'IC ?
+* Il y a-til des tests unitaires ?
+* Il y a-til des tests d'intégration ?
+* Est-ce que les dépendances sont bien définies dans le package.json. dependencies versus depDepencies. 
+* Il y a-t-il des dépendances qui ne so`nt pas utilisées ? Pour cela nous pouvons utiliser le module depcheck
+* Est-ce que le CSS est bien strucuté ? utilisation de BEM et ITCSS ?
+* 
+* Est-ce que le score sur Lighthouse est accepatable ?
+
+```
+npx depcheck
+```
+
+== RxJS
+
+* Il n'est pas recommandé d'utiliser la methode pluck car elle risque d'etre supprimee dans une futur version. Il est preferable d'utiliser la methode map.
+
+== Angular
+
+* est-ce que les obervable sont bien unsubscribe ?
+* est ce que l'application est découpées en module ? 
+* Font-ils du lazy loading de composants ?
+* Utilisent-ils la derniere version d'Angular ?
+
+
+== React
+
+== Vue
+
+== SEO
+
+= Docker
+
+== Image Docker pour Node.js
+
+* Vérifier que les dépendances sont installées via la flag --production pour éviter d'installer les dépendances de developpement.
+
+[source,shell]
+----
+npm install --production
+----
