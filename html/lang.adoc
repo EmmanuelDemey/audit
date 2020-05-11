@@ -1,0 +1,12 @@
+= Attribut Land
+
+Afin de sélectionner le bon accent par les synthétiseurs vocaux, il est très important de définir l'attribut `lang` dans les pages Web de vos applications. 
+
+La plupart du temps, cet attribut doit être définie directement sur la balise `html` de vos pages. 
+
+[source, html]
+----
+<html lang="fr">
+   ...
+</html>
+----
