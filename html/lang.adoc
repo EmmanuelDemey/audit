@@ -1,4 +1,4 @@
-= Attribut Lang
+== Attribut Lang
 
 Afin de sélectionner le bon accent par les synthétiseurs vocaux, il est très important de définir l'attribut `lang` dans les pages Web de vos applications. 
 

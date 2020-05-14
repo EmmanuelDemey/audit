@@ -1,0 +1,11 @@
+== Source Map Explorer
+
+`source-map-explorer` est un outil en ligne de commande permettant de comprendre le contenu d'un fichier JavaScript, et notamment 
+les modules qui sont importés. Le but est de comprendre les librairies qui ont un fort impact sur la taille du livrable final. 
+
+Pour l'utiliser, nous devons exécuter la commande suivante : 
+
+[source]
+----
+npx source-map-explorer file.js file.js.map
+----
