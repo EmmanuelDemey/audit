@@ -1,0 +1,5 @@
+== NPM
+
+Est-ce quele projet utilise la commande `npm ci` pour installer les dépendances dans les environnements de tests / CI ? 
+
+Nous pouvons également inviter à utiliser le flag `--production` lors de l'installation des dépendances dans un environnement de production. 
