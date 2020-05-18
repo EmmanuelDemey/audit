@@ -1,0 +1,14 @@
+== Lodash
+
+Si l'application auditée utilise Lodash, il faut tout voir si cela est vraiement nécessaire et si l'utilisation des méthodes natives
+du langagues pourraient pas étre utilisées à la place. 
+
+Si ce n'est pas le csa, il faut vérifier que toute la librairie n'est pas importée, mais bien que les méthodes nécessaires. Pour cela, 
+nous pouvons faire une recherche pour le mot `lodash` dans le code de l'application. 
+
+Il est préférable d'importer les méthode unitaire :
+
+[source, javascript]
+----
+import deburr from 'lodash.deburr';
+----

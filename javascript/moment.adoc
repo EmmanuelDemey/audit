@@ -1,0 +1,11 @@
+== Moment
+
+Si l'application auditée utilise la librairie Moment, il y a de grandes chances qu'une librairie peut etre utilisée à la place. 
+
+Car en effet, Moment n'est plus enormement maintenue lors de l'ecriture de ce paragraphe, et est connu également, si mal configurée, 
+pour inclure toutes les locales supportées même celles non nécessaires. 
+
+Voici une liste de librairies que vous pouvez envisager d'utiliser : 
+
+* dayjs : https://day.js.org/
+* date-fns : https://date-fns.org/
