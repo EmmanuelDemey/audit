@@ -1,0 +1,4 @@
+== Lien
+
+Un lien doit toujours avoir un attribut `href` valide. Si cette valeur est un `#` ou même aucun valeur n'est données, il 
+y a de très forte chance que cela soit un bouton que vous souhaitiez utiliser. 
