@@ -1,0 +1,9 @@
+== Layout
+
+Le standard HTML met a disposition des éléments HTML permettant de structure une page. Il faut s'assurer que l'application auditée utilise
+ces balises. Ces balises sont : 
+
+* header
+* main
+* aside
+* footer
