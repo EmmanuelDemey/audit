@@ -1,0 +1,3 @@
+== Champ invalid 
+
+Afin d'indiquer qu'un champ d'un formulaire n'est pas valide, vous devez ajouter l'attribut `aria-invalid=true`.
