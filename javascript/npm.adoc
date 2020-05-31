@@ -9,3 +9,18 @@ Nous pouvons également inviter à utiliser le flag `--production` lors de l'ins
 === npm audit
 
 Le projet utilise-t-il des dépendances avec des failles de sécurité connues ?
+
+[source]
+----
+npm audit
+----
+
+=== npm outdated
+
+Le projet utilise des dépendances non mises à jour ? Afin de faciliter la maintenance d'un projet, nous conseillons de mettre rapidement
+à jour les dépendances. En effet, le traitement en sera simplifié en comparant à une montée de version plus conséquante. 
+
+[source]
+----
+npm outdated
+----
