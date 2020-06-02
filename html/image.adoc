@@ -1,0 +1,5 @@
+== Image
+
+=== Chargement dynamique des images
+
+Afin d'optimiser les téléchargements des images, nous pouvons ajouter l'attribut `loading=lazy`. Cet attribut ne fonctionne que sur les navigateurs basés sur Chrome.
