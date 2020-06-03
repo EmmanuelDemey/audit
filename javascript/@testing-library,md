@@ -1,0 +1,3 @@
+== ESLint plugin
+
+Le projet utilise-t-il les plugin eslint-plugin-testing-library et eslint-plugin-jest-dom.
