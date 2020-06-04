@@ -1,0 +1,3 @@
+== Alias
+
+Est-ce que l'utilisateur d'elasticsarch a mis en place des alias afin de faciliter la gestion des reindexation des données ?
