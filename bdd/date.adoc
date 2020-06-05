@@ -1,0 +1,4 @@
+== Date
+
+Est-ce que l'utilisateur stock la date au format UTC mais égalenent la timezone locale de l'utilisateur ? Sans ces deux informations, nous serons
+incapables de gérer proprement les dates.
