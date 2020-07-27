@@ -3,6 +3,7 @@ const lighthouse = require("lighthouse");
 const chromeLauncher = require("chrome-launcher");
 const request = require("request");
 const util = require("util");
+const fs = require("fs");
 
 const options = {
   logLevel: "info",
@@ -33,7 +34,7 @@ async function lighthouseFromPuppeteer(url, options, config = null) {
 
 (async function () {
   const result = await lighthouseFromPuppeteer("https://pptr.dev", options);
-  console.log(`
+  const content = `
 # Audit
 
 ## Lighthouse
@@ -43,5 +44,9 @@ async function lighthouseFromPuppeteer(url, options, config = null) {
         return `* ${key}: ${note}`;
       })
       .join("\n")}
-  `);
+  `;
+
+  fs.writeFile("./result.md", content, () => {
+    console.log("file generated");
+  });
 })();
