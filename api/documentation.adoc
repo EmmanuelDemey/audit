@@ -1,0 +1,25 @@
+== Documentation 
+
+Voici des idées que nous pouvons mettre en place pour améliorer la documentation et ainsi donner envie aux développeurs de l'utiliser. 
+
+* Step by STep demo 
+* Swagger Doc
+* Complete parameter listing
+* Use cases
+* Curl examples
+* Quotas/pricing, ...
+* Access points
+* Roadmap + LTS
+* Automatique update
+* HTTP Status codes
+* Sample source code 
+* Sandbox calls
+* Example request
+* How to upgrade
+* Changelog
+* Video tutorial
+* Example response
+* Source code contribution
+* Search Engine
+* Blog
+* Error code description and solution
