@@ -13,6 +13,8 @@
     "lighthouse": "^6.1.1",
     "puppeteer": "^5.2.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "typescript": "^3.9.7"
+  },
   "description": ""
 }

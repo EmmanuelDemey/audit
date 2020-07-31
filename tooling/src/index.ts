@@ -6,13 +6,29 @@ const util = require("util");
 const fs = require("fs");
 const { argv } = require("yargs");
 
+type ChromeLauncherOptions = {
+  logLevel?: string;
+  disableDeviceEmulation?: boolean;
+  chromeFlags?: string[];
+  port?: number;
+};
+
+type AuditConfiguration = {
+  application: string;
+  url: string;
+};
+
 const options = {
   logLevel: "info",
   disableDeviceEmulation: true,
   chromeFlags: ["--disable-mobile-emulation"],
 };
 
-async function lighthouseFromPuppeteer(url, options, config = null) {
+async function lighthouseFromPuppeteer(
+  url: string,
+  options: ChromeLauncherOptions,
+  config = null
+) {
   const chrome = await chromeLauncher.launch(options);
   options.port = chrome.port;
 
@@ -27,13 +43,15 @@ async function lighthouseFromPuppeteer(url, options, config = null) {
   const { lhr } = await lighthouse(url, options, config);
   await browser.disconnect();
   await chrome.kill();
-  return Object.entries(lhr.categories).reduce(
+  return Object.entries(
+    lhr.categories as { title: string; score: string }[]
+  ).reduce(
     (acc, [_, result]) => ({ ...acc, [result.title]: result.score }),
     {}
   );
 }
 
-async function generateAudit({ application, url }) {
+async function generateAudit({ application, url }: AuditConfiguration) {
   const result = await lighthouseFromPuppeteer(url, options);
   const content = `
 # Audit
