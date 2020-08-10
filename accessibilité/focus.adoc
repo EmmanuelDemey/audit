@@ -1,0 +1,3 @@
+== Focus
+
+Nous ne devons pas désactiver le "focus state" d'un element HTML. 
