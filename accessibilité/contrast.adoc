@@ -1,0 +1,9 @@
+== Contrast
+
+=== Régle
+
+Le contraste entre le texte et son arriére plan doit être suffisant afin d'en faciliter sa lecture. 
+
+=== Outils
+
+Les Devtools de Chrome propose une interface graphique permettant de s'assurer que le contraste entre du texte et son arriére plan est suffisant. 
