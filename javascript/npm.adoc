@@ -24,3 +24,12 @@ Le projet utilise des dépendances non mises à jour ? Afin de faciliter la main
 ----
 npm outdated
 ----
+
+=== npm audit
+
+Pour vérifier que vous ne possédez pas de dépendances avec des vulnérabilités, vous devez éxecuter la commande suivante. 
+
+[source]
+----
+npm audit
+----
