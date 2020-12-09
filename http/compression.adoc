@@ -1,0 +1,3 @@
+== Compression 
+
+* Est-ce que les ressources statiques de l'application sont servie d'une manière compressées via des algorithmes comme `gzip` ou `brotli` ?
