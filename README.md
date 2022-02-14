@@ -1,7 +1,7 @@
 
 # Audit
 
-[![Actions Status](https://github.com/EmmanuelDemey/audit /workflows/Build/badge.svg)](https://github.com/EmmanuelDemey/audit/actions)
+[![Actions Status](https://github.com/EmmanuelDemey/audit/workflows/Build/badge.svg)](https://github.com/EmmanuelDemey/audit/actions)
 
 ## Installation
 
