@@ -106,3 +106,10 @@ dist
 *.js
 
 .git_repo/*
+
+
+# Mac tmp file
+.DS_Store
+
+# intellij tmp folder
+.idea
