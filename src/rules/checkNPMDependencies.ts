@@ -9,14 +9,14 @@ const isNPMDependency = (packageJson: any, dependency: string) => {
     return dependencies?.includes(dependency)
 }
 
-export const checkMomentDependency: AuditFunction = async (page: Page, metadata: Metadata): Promise<boolean> => {
+export const checkMomentDependency: AuditFunction = async (_page: Page, metadata: Metadata): Promise<boolean> => {
     return isNPMDependency(metadata.packageJson, "moment");
 };
 
-export const checkEslintDependency: AuditFunction = async (page: Page, metadata: Metadata): Promise<boolean> => {
+export const checkEslintDependency: AuditFunction = async (_page: Page, metadata: Metadata): Promise<boolean> => {
     return isNPMDependency(metadata.packageJson, "eslint");
 };
 
-export const checkHuskyDependency: AuditFunction = async (page: Page, metadata: Metadata): Promise<boolean> => {
+export const checkHuskyDependency: AuditFunction = async (_page: Page, metadata: Metadata): Promise<boolean> => {
     return isNPMDependency(metadata.packageJson, "husky");
 };

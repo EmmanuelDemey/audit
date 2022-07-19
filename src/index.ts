@@ -2,14 +2,13 @@ import {rules, rulesPerPage, asyncRules, asyncRulesPerPage} from "./rules";
 import {AuditFunction, AuditResult, Metadata, Result} from "./types";
 import {clone, getGitMetadata} from "./metadatas/git";
 import {getReadmeMetadata} from "./metadatas/readme";
-import {Page, Protocol} from "puppeteer";
+import puppeteer, {Page, Protocol} from "puppeteer";
 import commandLineArgs, {CommandLineOptions} from "command-line-args";
 import yaml from "js-yaml";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import audit from "eco-index-audit/src/ecoindex/audit";
-import puppeteer from "puppeteer";
 import path from "path";
 import fs from "fs";
 import ResponseReceivedEvent = Protocol.Network.ResponseReceivedEvent;
@@ -225,10 +224,9 @@ const optionDefinitions = [
 
   result.biggestRequest = topFive as any;
 
-
+  
   Object.values(result.audits ?? {}).forEach(audit => {
     Object.values(audit).forEach(result => {
-      console.log(result.name);
       result.message = fr.rules[result.name as string](result.payload)
     })
   })
