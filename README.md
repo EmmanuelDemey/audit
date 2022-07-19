@@ -1,13 +1,15 @@
 
 # Audit
 
-[![Actions Status](https://github.com/EmmanuelDemey/audit /workflows/Build/badge.svg)](https://github.com/EmmanuelDemey/audit/actions)
+[![Actions Status](https://github.com/EmmanuelDemey/audit/workflows/Build/badge.svg)](https://github.com/EmmanuelDemey/audit/actions)
 
 ## Installation
 
 
 ```bash
 git clone https://github.com/EmmanuelDemey/audit
+cd audit 
+npm install
 ```
 
 ## Usage/Examples
@@ -30,7 +32,7 @@ exporter: logger
 
 ```
 
-And use this file thankt to the `--config` option. 
+And use this file thanks to the `--config` option. 
 
 ```shell
 npm run start -- --config config.yaml
