@@ -3,7 +3,6 @@ auditor:
   email: demey.emmanuel@gmail.com
 
 audit:
-  path: ../training-platform
   urls:
     - https://google.com
 
