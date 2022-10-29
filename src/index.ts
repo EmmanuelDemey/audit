@@ -27,6 +27,16 @@ const optionDefinitions = [
   { name: "url", type: String, multiple: true },
 ];
 
+function checkUrl (url: string): boolean {
+  let givenURL
+  try {
+      givenURL = new URL (url);
+  } catch (error) {
+     return false; 
+  }
+  return givenURL.protocol === "http:" || givenURL.protocol === "https:";
+}
+
 (async () => {
   const cliOptions = commandLineArgs(optionDefinitions);
   const options: CommandLineOptions = cliOptions.config ? yaml.load(fs.readFileSync(path.resolve(cliOptions.config), 'utf-8')) as CommandLineOptions : cliOptions;
@@ -39,6 +49,13 @@ const optionDefinitions = [
 
   const browser = await puppeteer.launch();
   const page: Page = await browser.newPage();
+
+
+  const wrongUrl = options.audit.urls.find((url: string) => !checkUrl(url));
+  if(wrongUrl){
+    console.error(`You have at least one malformed URL`);
+    process.exit(1)
+  }
 
   const metadata: Metadata = {
     urls: options.audit.urls
