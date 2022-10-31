@@ -18,7 +18,8 @@ export const fr: Dictionary = {
         "check-if-landmarks": (_: CheckIfLandmarksAuditResult) => {
             return "Vous devez avoir une valise <header>, <nav>, <main> et <footer> dans votre page";
         },
-        "check-if-link-inside-button": () => "Sémantiquement, il est interdit d'avoir un lien dans un bouton",
+        "check-if-lighthouse-c-i": () => "Afin de s'assurer que votre projet reste de qualité (performance et accessibilité), nous vous conseillons de mettre en place Lighthouse CI dans votre CI",
+        "check-if-link-inside-a-button": () => "Sémantiquement, il est interdit d'avoir un lien dans un bouton",
         "check-if-link-inside-label": () => "Pour des raisons d'accessibilité, vous ne pouvez avoir de liens dans un label de formulaire",
         "check-if-main-lang": () => "Vous devez avoir l'attribut lang présent sur la balise html",
         "check-moment-dependency": () => "Il semblerait que vous utilisez la librairie Moment.js. Celle-ci n'est plus maintenue. Nous vous recommendons d'utiliser des librairies plus légères comme Day.js ou Date-fns",
