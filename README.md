@@ -35,12 +35,13 @@ exporter: logger
 And use this file thanks to the `--config` option. 
 
 ```shell
-npm run start -- --config config.yaml
+npx nx build cli
+node dist/packages/cli/src/index.js --config config.yaml
 ```
 
 ## Tech Stack
 
-Typescript, Puppeteer, Github Actions
+Typescript, Puppeteer, Github Actions, NX
 
 
 ## Authors

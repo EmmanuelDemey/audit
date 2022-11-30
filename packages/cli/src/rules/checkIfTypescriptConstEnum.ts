@@ -1,7 +1,6 @@
 import {AsyncAuditFunction, AuditResult} from "../types";
-import {Inquirer} from "inquirer";
 
-export const checkIfTypescriptConstEnum: AsyncAuditFunction = async (inquirer: Inquirer): Promise<AuditResult | false> => {
+export const checkIfTypescriptConstEnum: AsyncAuditFunction = async (inquirer: any): Promise<AuditResult | false> => {
     const answers = await inquirer.prompt([{
         type: "confirm",
         name: "checkIfTypescriptConstEnum",

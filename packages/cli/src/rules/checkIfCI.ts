@@ -1,7 +1,6 @@
 import {AsyncAuditFunction} from "../types";
-import {Inquirer} from "inquirer";
 
-export const checkIfCi: AsyncAuditFunction = async (inquirer: Inquirer): Promise<boolean> => {
+export const checkIfCi: AsyncAuditFunction = async (inquirer: any): Promise<boolean> => {
     const answers = await inquirer.prompt([{
         type: "confirm",
         name: "checkIfCI",

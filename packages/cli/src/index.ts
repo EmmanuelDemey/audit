@@ -5,6 +5,7 @@ import {getReadmeMetadata} from "./metadatas/readme";
 import puppeteer, {Page, Protocol} from "puppeteer";
 import commandLineArgs, {CommandLineOptions} from "command-line-args";
 import yaml from "js-yaml";
+import inquirer from 'inquirer';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -17,7 +18,6 @@ import {fr} from "./i18n/fr";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import kebabCase from "kebab-case";
-import inquirer from "inquirer";
 
 
 const optionDefinitions = [
@@ -121,7 +121,7 @@ function checkUrl (url: string): boolean {
     return auditResult
   }
 
-  async function asyncRuleAndFormat(rule: (inquirer: inquirer.Inquirer) => Promise<AuditResult | boolean>) {
+  async function asyncRuleAndFormat(rule: (inquirer: any) => Promise<AuditResult | boolean>) {
     const auditResult = await rule(inquirer);
     if(auditResult === true) {
       return {
