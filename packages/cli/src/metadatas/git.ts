@@ -1,4 +1,4 @@
-import {GitMetadata} from "../types";
+import {GitMetadata} from "@audit/model";
 import simpleGit, { SimpleGit } from 'simple-git';
 import path from "path";
 import { v4 as uuidv4 } from 'uuid';

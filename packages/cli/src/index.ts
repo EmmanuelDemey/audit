@@ -1,5 +1,5 @@
-import {rules, rulesPerPage, asyncRules, asyncRulesPerPage} from "./rules";
-import {AuditFunction, AuditResult, Metadata, Result} from "./types";
+import {rules, rulesPerPage, asyncRules, asyncRulesPerPage} from "@audit/rules";
+import {AuditFunction, AuditResult, Metadata, Result} from "@audit/model";
 import {clone, getGitMetadata} from "./metadatas/git";
 import {getReadmeMetadata} from "./metadatas/readme";
 import puppeteer, {Page, Protocol} from "puppeteer";
@@ -14,7 +14,7 @@ import path from "path";
 import fs from "fs";
 import ResponseReceivedEvent = Protocol.Network.ResponseReceivedEvent;
 import LoadingFinishedEvent = Protocol.Network.LoadingFinishedEvent;
-import {fr} from "./i18n/fr";
+import {fr} from "@audit/i18n/fr";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import kebabCase from "kebab-case";
@@ -38,6 +38,8 @@ function checkUrl (url: string): boolean {
 }
 
 (async () => {
+ 
+
   const cliOptions = commandLineArgs(optionDefinitions);
   const options: CommandLineOptions = cliOptions.config ? yaml.load(fs.readFileSync(path.resolve(cliOptions.config), 'utf-8')) as CommandLineOptions : cliOptions;
 
@@ -252,8 +254,8 @@ function checkUrl (url: string): boolean {
   await browser.close();
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { default: exporter } = require("./exporter/" + options.exporter);
+    const exporter = await import(path.resolve(__dirname, "../../exporter/", options.exporter)).then(module => module.default);
+
     exporter({
       ...result,
       metadata
