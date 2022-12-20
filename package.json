@@ -7,7 +7,7 @@
   "dependencies": {
     "tslib": "^2.3.0",
     "command-line-args": "^5.1.1",
-    "eco-index-audit": "0.1.0",
+    "eco-index-audit": "0.10.0",
     "inquirer": "^8.2.0",
     "js-yaml": "^4.1.0",
     "kebab-case": "^1.0.1",
