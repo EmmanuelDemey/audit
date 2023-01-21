@@ -17,9 +17,7 @@
     "paths": {
       "@audit/cli": ["packages/cli/src/index.ts"],
       "@audit/exporter/logger": ["packages/exporter/logger/src/index.ts"],
-      "@audit/i18n/fr": ["packages/i18n/fr/src/index.ts"],
-      "@audit/model": ["packages/model/src/index.ts"],
-      "@audit/rules": ["packages/rules/src/index.ts"]
+      "@audit/model": ["packages/model/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

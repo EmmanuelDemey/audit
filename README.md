@@ -36,7 +36,7 @@ And use this file thanks to the `--config` option.
 
 ```shell
 npx nx build cli
-node dist/packages/cli/src/index.js --config config.yaml
+node dist/packages/cli/src/index.js --config ./demo/example.yaml
 ```
 
 ## Tech Stack

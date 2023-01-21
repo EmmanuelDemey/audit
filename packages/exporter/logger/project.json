@@ -22,11 +22,12 @@
       }
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nrwl/vite:test",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "packages/exporter/logger/jest.config.ts",
-        "passWithNoTests": true
+        "passWithNoTests": true,
+        "coverage": true,
+        "coverageProvider": "c8"
       }
     }
   },
