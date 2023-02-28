@@ -6,7 +6,7 @@ import puppeteer, { Page, Protocol } from 'puppeteer';
 import commandLineArgs, { CommandLineOptions } from 'command-line-args';
 import yaml from 'js-yaml';
 import inquirer from 'inquirer';
-
+import {generateAccessibilityTree} from '@audit/rules/accessibility'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import audit from 'eco-index-audit/src/ecoindex/audit';
@@ -61,6 +61,7 @@ function checkUrl(url: string): boolean {
 
   const metadata: Metadata = {
     urls: options.audit.urls,
+    accessibilityTrees: {}
   };
 
   if (options.auditor) {
@@ -188,6 +189,12 @@ function checkUrl(url: string): boolean {
 
     result.ecoIndex = await audit(url);
     await page.goto(url);
+
+    if (metadata.accessibilityTrees) {
+      metadata.accessibilityTrees[url] = await generateAccessibilityTree(page, url);
+    }
+
+    console.log(metadata)
     for (const rule of rulesPerPage) {
       const auditResult = await ruleAndFormat(rule, page, metadata);
       if (auditResult && auditResult.name && result.audits) {

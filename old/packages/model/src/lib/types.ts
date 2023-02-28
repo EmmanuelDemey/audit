@@ -5,6 +5,9 @@ export interface Metadata {
     git?: GitMetadata;
     readme?: boolean,
     urls?: string[],
+    accessibilityTrees?: {
+        [key: string]: any
+    }
     auditor?: {
         name: string;
         email: string;
