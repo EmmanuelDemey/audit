@@ -35,6 +35,25 @@ const checkTitle = async (page: Page): Promise<RuleResult> => {
     }
 }
 
+const checkHeadingWithAlertOrStatusAriaRole = async (page: Page): Promise<RuleResult> => {
+    let selector = '';
+    for(let i = 1; i <= 6; i++){
+        selector += `h${i}[role='status'],h${i}1[role='alert']`
+        if(i !== 6){
+            selector += ',';
+        }
+    }
+    const headers = await page.evaluate((selector) => Array.from(document.querySelectorAll(selector)), selector)
+    return {
+        'check-heading-with-alert-or-status-aria-role': {
+            valid: headers.length === 0,
+            categories: [CATEGORIES.ACCESSIBILITY],
+            links: [
+            ]
+        }
+    }
+}
+
 const auditExternalWebPage = async ({url, page}: {url: string, page: Page}): Promise<PageAuditResult> => {
     const pageAuditResult: PageAuditResult = {};
     await page.goto(url); 
@@ -42,7 +61,9 @@ const auditExternalWebPage = async ({url, page}: {url: string, page: Page}): Pro
     pageAuditResult.title = await getHomePageTitle(page);
     pageAuditResult.lang = await getLang(page);
     pageAuditResult.rulesResult = {
-        ...(await checkTitle(page))
+        ...(await checkTitle(page)),
+        ...(await checkHeadingWithAlertOrStatusAriaRole(page))
+
     }
 
     return pageAuditResult;
