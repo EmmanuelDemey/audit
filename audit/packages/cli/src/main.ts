@@ -33,9 +33,9 @@ const checkTitle = async (page: Page): Promise<RuleResult> => {
     }
 }
 
-const auditExternalWebPage = async (url: string, page: Page): Promise<PageAuditResult> => {
+const auditExternalWebPage = async ({url, page}: {url: string, page: Page}): Promise<PageAuditResult> => {
     const pageAuditResult: PageAuditResult = {};
-    await page.goto('https://www.emmanueldemey.dev/'); 
+    await page.goto(url); 
 
     pageAuditResult.title = await getHomePageTitle(page);
     pageAuditResult.lang = await getLang(page);
@@ -53,7 +53,7 @@ const auditExternalWebPage = async (url: string, page: Page): Promise<PageAuditR
   const results: AuditResults = {} 
 
   const url = 'https://www.emmanueldemey.dev/';
-  results[url] = await auditExternalWebPage(url, page);
+  results[url] = await auditExternalWebPage({url, page});
 
   await browser.close();
 
