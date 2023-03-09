@@ -1,5 +1,7 @@
 import { exporterLogger } from '@audit/exporter-logger';
+import { mkdirSync } from 'fs';
 import puppeteer, { Page } from 'puppeteer';
+import { simpleGit } from 'simple-git';
 
 const getHomePageTitle = (page: Page): Promise<string> => {
     return page.title();
@@ -47,6 +49,10 @@ const auditExternalWebPage = async ({url, page}: {url: string, page: Page}): Pro
 }
 
 (async () => {
+  mkdirSync("./.tmp", { recursive: true});  
+  const git = simpleGit();
+  git.clone("https://github.com/EmmanuelDemey/audit", "./.tmp", { '--depth': 1})  
+
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
