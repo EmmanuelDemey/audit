@@ -11,11 +11,11 @@ const getLang = (page: Page): Promise<string> => {
     return page.evaluate(() => document.querySelector('html').getAttribute("lang"));
 };
 
-interface RuleResult { [ruleName: string]: boolean | { valid: boolean, categories: CATEGORIES[], links?: string[] }}
+type RuleResult = boolean | { valid: boolean, categories: CATEGORIES[], links?: string[] }
 interface PageAuditResult {
     title?: string;
     lang?: string;
-    rulesResult?: RuleResult
+    rulesResult?: {[ruleName: string]: RuleResult}
 }
 
 type AuditResults = { [url: string]: PageAuditResult};
@@ -25,13 +25,11 @@ enum CATEGORIES { ACCESSIBILITY = "ACCESSIBILITY" }
 const checkTitle = async (page: Page): Promise<RuleResult> => {
     const title = await getHomePageTitle(page);
     return {
-        'check-title': {
-            valid: !!title,
-            categories: [CATEGORIES.ACCESSIBILITY],
-            links: [
-                'https://www.w3.org/WAI/WCAG21/Understanding/page-titled'
-            ]
-        }
+        valid: !!title,
+        categories: [CATEGORIES.ACCESSIBILITY],
+        links: [
+            'https://www.w3.org/WAI/WCAG21/Understanding/page-titled'
+        ]
     }
 }
 
@@ -45,14 +43,14 @@ const checkHeadingWithAlertOrStatusAriaRole = async (page: Page): Promise<RuleRe
     }
     const headers = await page.evaluate((selector) => Array.from(document.querySelectorAll(selector)), selector)
     return {
-        'check-heading-with-alert-or-status-aria-role': {
-            valid: headers.length === 0,
-            categories: [CATEGORIES.ACCESSIBILITY],
-            links: [
-            ]
-        }
+        valid: headers.length === 0,
+        categories: [CATEGORIES.ACCESSIBILITY],
+        links: [
+        ]
     }
 }
+
+const rules: Array<(page: Page) => Promise<RuleResult>> = [checkTitle, checkHeadingWithAlertOrStatusAriaRole];
 
 const auditExternalWebPage = async ({url, page}: {url: string, page: Page}): Promise<PageAuditResult> => {
     const pageAuditResult: PageAuditResult = {};
@@ -60,11 +58,18 @@ const auditExternalWebPage = async ({url, page}: {url: string, page: Page}): Pro
 
     pageAuditResult.title = await getHomePageTitle(page);
     pageAuditResult.lang = await getLang(page);
-    pageAuditResult.rulesResult = {
-        ...(await checkTitle(page)),
-        ...(await checkHeadingWithAlertOrStatusAriaRole(page))
 
-    }
+    const results: {[ruleName: string]: RuleResult} = await Promise.all(rules.map(rule => rule(page))).then(results => {
+        return results.reduce((acc, result, index) => {
+            return {
+                ...acc,
+                [rules[index].name]: result
+
+            }
+        }, {})
+    });
+
+    pageAuditResult.rulesResult = results;
 
     return pageAuditResult;
 }
