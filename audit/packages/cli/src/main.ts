@@ -1,13 +1,11 @@
-import { exporterLogger } from '@audit/exporter-logger';
-import { mkdirSync } from 'fs';
+import { mkdirSync, rmSync } from 'fs';
+import { resolve } from 'path';
 import puppeteer, { Browser, Page } from 'puppeteer';
-import { simpleGit } from 'simple-git';
+import { simpleGit, SimpleGit } from 'simple-git';
 
 
 // DOMAIN 
-type RuleResult =
-  | boolean
-  | { valid: boolean; categories: CATEGORIES[]; links?: string[] };
+type RuleResult = { valid: boolean; categories: CATEGORIES[]; links?: string[] };
 interface PageAuditResult {
   title?: string;
   lang?: string;
@@ -20,12 +18,16 @@ enum CATEGORIES {
   ACCESSIBILITY = 'ACCESSIBILITY',
 }
 
-class PageAudit {
-    constructor(private readonly scrapper: WebPageScrapper) {}
+interface Audit {
+  audit: (urls: string[]) => Promise<PageAuditResult>
+}
+
+class PageAudit implements Audit  {
+    constructor(private readonly scrapper: WebPageScrapper, private readonly codeFetcher: CodeFetcher, private readonly outputs: Output[]) {}
   
     private async auditExternalWebPage() {
       const pageAuditResult: PageAuditResult = {};
-  
+      
       pageAuditResult.title = await this.scrapper.getHomePageTitle();
       pageAuditResult.lang = await this.scrapper.getLang();
   
@@ -42,12 +44,23 @@ class PageAudit {
   
       pageAuditResult.rulesResult = results;
   
+
+
       return pageAuditResult;
     }
-    async audit(url: string) {
+    async audit(urls: string[]) {
+      const codePath = await this.codeFetcher.fetch();
+      console.log(codePath)
+
       const results: AuditResults = {};
-      await this.scrapper.visit(url);
-      results[url] = await this.auditExternalWebPage();
+
+      for(const url of urls){
+        await this.scrapper.visit(url);
+        results[url] = await this.auditExternalWebPage();
+      }
+      
+      this.outputs.forEach(output => output.convert(results))
+
       return results;
     }
   }
@@ -130,20 +143,45 @@ class PuppeteerPageScrapper implements WebPageScrapper {
 }
 
 
+interface CodeFetcher {
+  fetch: () => Promise<string>;
+}
 
+class GitCodeFetcher implements CodeFetcher {
+  private readonly tempFolder = './.tmp';
+  private git: SimpleGit;
+
+  constructor(private readonly url: string){
+    rmSync(this.tempFolder, { recursive: true, force: true});
+    mkdirSync(this.tempFolder, { recursive: true})
+    this.git = simpleGit();
+  }
+  fetch(): Promise<string> {
+    return this.git.clone(this.url, this.tempFolder, {
+      '--depth': 1,
+    });
+  }
+}
+
+interface Output {
+  convert: (result: AuditResults) => void;
+}
+
+
+
+
+interface AuditConfig {
+  githubUrl: string,
+  urls: string[],
+  outputs: Output[]
+}
 (async () => {
-  mkdirSync('./.tmp', { recursive: true });
-  const git = simpleGit();
-  git.clone('https://github.com/EmmanuelDemey/audit', './.tmp', {
-    '--depth': 1,
-  });
-
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const config: AuditConfig = require(resolve(process.cwd(), 'audit.config.js'));
+  const codeFetcher = new GitCodeFetcher(config.githubUrl);
   const scrapper = new PuppeteerPageScrapper();
-  const url = 'https://www.emmanueldemey.dev/';
-  const auditor = new PageAudit(scrapper);
-  const results = await auditor.audit(url);
+  const auditor = new PageAudit(scrapper, codeFetcher, config.outputs ?? []);
+  await auditor.audit(config.urls);
   scrapper.tearDown();
-
-  exporterLogger(JSON.stringify(results));
   process.exit(0);
 })();
