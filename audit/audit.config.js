@@ -11,7 +11,7 @@ class AstroOutput  {
         this.distFolder = distFolder
     }
     convert(result) {
-        fse.copySync("./template", this.distFolder, {overwrite: true})
+        //fse.copySync("./template", this.distFolder, {overwrite: true})
         console.log(JSON.stringify(result, null, 4));
     }
 }

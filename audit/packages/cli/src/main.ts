@@ -2,115 +2,9 @@ import { mkdirSync, rmSync } from 'fs';
 import { resolve } from 'path';
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { simpleGit, SimpleGit } from 'simple-git';
+import { PageAudit } from '@audit/domain';
+import { WebPageScrapper, CodeFetcher, AuditConfig } from '@audit/model';
 
-
-// DOMAIN 
-type RuleResult = { valid: boolean; categories: CATEGORIES[]; links?: string[] };
-interface PageAuditResult {
-  title?: string;
-  lang?: string;
-  scripts?: string[];
-  links?: string[];
-  rulesResult?: { [ruleName: string]: RuleResult };
-}
-
-type AuditResults = { [url: string]: PageAuditResult };
-
-enum CATEGORIES {
-  ACCESSIBILITY = 'ACCESSIBILITY',
-}
-
-interface Audit {
-  audit: (urls: string[]) => Promise<PageAuditResult>
-}
-
-class PageAudit implements Audit  {
-    constructor(private readonly scrapper: WebPageScrapper, private readonly codeFetcher: CodeFetcher, private readonly outputs: Output[]) {}
-  
-    private async auditExternalWebPage() {
-      const pageAuditResult: PageAuditResult = {};
-      
-      pageAuditResult.title = await this.scrapper.getHomePageTitle();
-      pageAuditResult.lang = await this.scrapper.getLang();
-      pageAuditResult.scripts = await this.scrapper.getExternalJavaScript();
-      pageAuditResult.links = await this.scrapper.getExternalCSS();
-
-      const results: { [ruleName: string]: RuleResult } = await Promise.all(
-        rules.map((rule) => rule(this.scrapper))
-      ).then((results) => {
-        return results.reduce((acc, result, index) => {
-          return {
-            ...acc,
-            [rules[index].name]: result,
-          };
-        }, {});
-      });
-  
-      pageAuditResult.rulesResult = results;
-  
-
-
-      return pageAuditResult;
-    }
-    async audit(urls: string[]) {
-      const codePath = await this.codeFetcher.fetch();
-      console.log(codePath)
-
-      const results: AuditResults = {};
-
-      for(const url of urls){
-        await this.scrapper.visit(url);
-        results[url] = await this.auditExternalWebPage();
-      }
-      
-      this.outputs.forEach(output => output.convert(results))
-
-      return results;
-    }
-  }
-
-const checkTitle = async (scrapper: WebPageScrapper): Promise<RuleResult> => {
-  const title = await scrapper.getHomePageTitle();
-  return {
-    valid: !!title,
-    categories: [CATEGORIES.ACCESSIBILITY],
-    links: ['https://www.w3.org/WAI/WCAG21/Understanding/page-titled'],
-  };
-};
-
-const checkHeadingWithAlertOrStatusAriaRole = async (
-  scrapper: WebPageScrapper
-): Promise<RuleResult> => {
-  let selector = '';
-  for (let i = 1; i <= 6; i++) {
-    selector += `h${i}[role='status'],h${i}1[role='alert']`;
-    if (i !== 6) {
-      selector += ',';
-    }
-  }
-  const headers = await scrapper.querySelectorAll(selector);
-  return {
-    valid: headers.length === 0,
-    categories: [CATEGORIES.ACCESSIBILITY],
-    links: [],
-  };
-};
-
-const rules: Array<(scrapper: WebPageScrapper) => Promise<RuleResult>> = [
-  checkTitle,
-  checkHeadingWithAlertOrStatusAriaRole,
-];
-
-// Infrastructure
-interface WebPageScrapper {
-  visit: (url: string) => void;
-  getHomePageTitle: () => Promise<string>;
-  getLang: () => Promise<string>;
-  querySelectorAll: (selector: string) => Promise<Element[]>;
-  tearDown: () => void;
-  getExternalJavaScript: () => Promise<string[]>;
-  getExternalCSS: () => Promise<string[]>;
-}
 
 class PuppeteerPageScrapper implements WebPageScrapper {
   
@@ -159,11 +53,6 @@ class PuppeteerPageScrapper implements WebPageScrapper {
   }
 }
 
-
-interface CodeFetcher {
-  fetch: () => Promise<string>;
-}
-
 class GitCodeFetcher implements CodeFetcher {
   private readonly tempFolder = './.tmp';
   private git: SimpleGit;
@@ -180,18 +69,7 @@ class GitCodeFetcher implements CodeFetcher {
   }
 }
 
-interface Output {
-  convert: (result: AuditResults) => void;
-}
 
-
-
-
-interface AuditConfig {
-  githubUrl: string,
-  urls: string[],
-  outputs: Output[]
-}
 (async () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const config: AuditConfig = require(resolve(process.cwd(), 'audit.config.js'));

@@ -15,7 +15,10 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@audit/exporter-logger": ["packages/exporter-logger/src/index.ts"]
+      "@audit/domain": ["packages/domain/src/index.ts"],
+      "@audit/exporter-logger": ["packages/exporter-logger/src/index.ts"],
+      "@audit/model": ["packages/model/src/index.ts"],
+      "@audit/rules": ["packages/rules/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
