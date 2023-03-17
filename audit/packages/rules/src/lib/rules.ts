@@ -1,5 +1,22 @@
 import {WebPageScrapper, RuleResult, CATEGORIES} from "@audit/model";
 
+const linksWithoutHref =async (scrapper: WebPageScrapper): Promise<RuleResult> => {
+  const elements = await scrapper.querySelectorAll("a:not([href])");
+  return {
+    valid: elements.length === 0,
+    categories: [CATEGORIES.ACCESSIBILITY],
+    links: [],
+  };
+}
+const linksWithHashHref = async (scrapper: WebPageScrapper): Promise<RuleResult> => {
+  const elements = await scrapper.querySelectorAll("a[href='#']");
+  return {
+    valid: elements.length === 0,
+    categories: [CATEGORIES.ACCESSIBILITY],
+    links: [],
+  };
+};
+
 const checkTitle = async (scrapper: WebPageScrapper): Promise<RuleResult> => {
   const title = await scrapper.getHomePageTitle();
   return {
@@ -30,4 +47,6 @@ const checkHeadingWithAlertOrStatusAriaRole = async (
 export const rules: Array<(scrapper: WebPageScrapper) => Promise<RuleResult>> = [
   checkTitle,
   checkHeadingWithAlertOrStatusAriaRole,
+  linksWithoutHref,
+  linksWithHashHref
 ];
