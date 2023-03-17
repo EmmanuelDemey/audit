@@ -9,6 +9,8 @@ type RuleResult = { valid: boolean; categories: CATEGORIES[]; links?: string[] }
 interface PageAuditResult {
   title?: string;
   lang?: string;
+  scripts?: string[];
+  links?: string[];
   rulesResult?: { [ruleName: string]: RuleResult };
 }
 
@@ -30,7 +32,9 @@ class PageAudit implements Audit  {
       
       pageAuditResult.title = await this.scrapper.getHomePageTitle();
       pageAuditResult.lang = await this.scrapper.getLang();
-  
+      pageAuditResult.scripts = await this.scrapper.getExternalJavaScript();
+      pageAuditResult.links = await this.scrapper.getExternalCSS();
+
       const results: { [ruleName: string]: RuleResult } = await Promise.all(
         rules.map((rule) => rule(this.scrapper))
       ).then((results) => {
@@ -104,9 +108,12 @@ interface WebPageScrapper {
   getLang: () => Promise<string>;
   querySelectorAll: (selector: string) => Promise<Element[]>;
   tearDown: () => void;
+  getExternalJavaScript: () => Promise<string[]>;
+  getExternalCSS: () => Promise<string[]>;
 }
 
 class PuppeteerPageScrapper implements WebPageScrapper {
+  
   private browser: Browser | null;
   tab: Page;
 
@@ -129,6 +136,16 @@ class PuppeteerPageScrapper implements WebPageScrapper {
   getLang(): Promise<string> {
     return this.tab.evaluate(() =>
       document.querySelector('html').getAttribute('lang')
+    );
+  }
+  getExternalJavaScript(): Promise<string[]> {
+    return this.tab.evaluate(() =>
+      Array.from(document.querySelectorAll('script')).map((script: HTMLScriptElement) => script.src)
+    );
+  }
+  getExternalCSS(): Promise<string[]> {
+    return this.tab.evaluate(() =>
+      Array.from(document.querySelectorAll('link')).map((script: HTMLLinkElement) => script.href)
     );
   }
   querySelectorAll(selector: string): Promise<Element[]> {
