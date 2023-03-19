@@ -20,5 +20,6 @@ class AstroOutput  {
 module.exports = {
     githubUrl: 'https://github.com/EmmanuelDemey/audit',
     urls: ['https://www.emmanueldemey.dev/'],
-    outputs: [new AstroOutput("report_emmanueldemeydev")]
+    outputs: [new AstroOutput("report_emmanueldemeydev")],
+    excludes: []
 }

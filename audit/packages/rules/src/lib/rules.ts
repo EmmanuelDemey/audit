@@ -1,52 +1,65 @@
-import {WebPageScrapper, RuleResult, CATEGORIES} from "@audit/model";
+import {
+  WebPageScrapper,
+  RuleResult,
+  CATEGORIES,
+  RuleFactory,
+} from '@audit/model';
 
-const linksWithoutHref =async (scrapper: WebPageScrapper): Promise<RuleResult> => {
-  const elements = await scrapper.querySelectorAll("a:not([href])");
+const linksWithoutHref = (): RuleFactory => {
   return {
-    valid: elements.length === 0,
     categories: [CATEGORIES.ACCESSIBILITY],
     links: [],
-  };
-}
-const linksWithHashHref = async (scrapper: WebPageScrapper): Promise<RuleResult> => {
-  const elements = await scrapper.querySelectorAll("a[href='#']");
-  return {
-    valid: elements.length === 0,
-    categories: [CATEGORIES.ACCESSIBILITY],
-    links: [],
+    check: async (scrapper: WebPageScrapper): Promise<boolean> => {
+      const elements = await scrapper.querySelectorAll('a:not([href])');
+      return elements.length === 0;
+    },
   };
 };
 
-const checkTitle = async (scrapper: WebPageScrapper): Promise<RuleResult> => {
-  const title = await scrapper.getHomePageTitle();
+const linksWithHashHref = (): RuleFactory => {
   return {
-    valid: !!title,
-    categories: [CATEGORIES.ACCESSIBILITY],
-    links: ['https://www.w3.org/WAI/WCAG21/Understanding/page-titled'],
-  };
-};
-
-const checkHeadingWithAlertOrStatusAriaRole = async (
-  scrapper: WebPageScrapper
-): Promise<RuleResult> => {
-  let selector = '';
-  for (let i = 1; i <= 6; i++) {
-    selector += `h${i}[role='status'],h${i}1[role='alert']`;
-    if (i !== 6) {
-      selector += ',';
-    }
-  }
-  const headers = await scrapper.querySelectorAll(selector);
-  return {
-    valid: headers.length === 0,
     categories: [CATEGORIES.ACCESSIBILITY],
     links: [],
+    check: async (scrapper: WebPageScrapper): Promise<boolean> => {
+      const elements = await scrapper.querySelectorAll("a[href='#']");
+      return elements.length === 0;
+    },
   };
 };
 
-export const rules: Array<(scrapper: WebPageScrapper) => Promise<RuleResult>> = [
-  checkTitle,
-  checkHeadingWithAlertOrStatusAriaRole,
-  linksWithoutHref,
-  linksWithHashHref
-];
+const checkTitle = (): RuleFactory => {
+  return {
+    categories: [CATEGORIES.ACCESSIBILITY],
+    links: [],
+    check: async (scrapper: WebPageScrapper): Promise<boolean> => {
+      const title = await scrapper.getHomePageTitle();
+      return !!title;
+    },
+  };
+};
+
+const checkHeadingWithAlertOrStatusAriaRole = (): RuleFactory => {
+  return {
+    categories: [CATEGORIES.ACCESSIBILITY],
+    links: [],
+    check: async (scrapper: WebPageScrapper): Promise<boolean> => {
+      let selector = '';
+      for (let i = 1; i <= 6; i++) {
+        selector += `h${i}[role='status'],h${i}1[role='alert']`;
+        if (i !== 6) {
+          selector += ',';
+        }
+      }
+      const headers = await scrapper.querySelectorAll(selector);
+      return headers.length === 0;
+    },
+  };
+};
+
+export const rules: Array<() => RuleFactory> =
+  [
+    checkTitle,
+    checkHeadingWithAlertOrStatusAriaRole,
+    linksWithoutHref,
+    linksWithHashHref,
+  ];

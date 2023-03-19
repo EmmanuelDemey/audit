@@ -12,8 +12,14 @@ export interface WebPageScrapper {
   getExternalCSS: () => Promise<string[]>;
 }
 
-export type RuleResult = { valid: boolean; categories: CATEGORIES[]; links?: string[] };
+export type RuleFactory = {
+  categories: CATEGORIES[]; 
+  links?: string[];
+  check: (scrapper: WebPageScrapper) => Promise<boolean>
+}
 
+export type RuleResult = { valid: boolean };
+export type RuleFactoryAndResult = RuleFactory & RuleResult;
 
 export interface CodeFetcher {
   fetch: () => Promise<string>;
@@ -26,7 +32,8 @@ export interface Output {
 export interface AuditConfig {
   githubUrl: string,
   urls: string[],
-  outputs: Output[]
+  outputs: Output[],
+  excludes?: CATEGORIES[]
 }
 
 export interface PageAuditResult {
@@ -42,5 +49,5 @@ export type AuditResults = { [url: string]: PageAuditResult };
 
 
 export interface Audit {
-  audit: (urls: string[]) => Promise<PageAuditResult>
+  audit: (config: AuditConfig) => Promise<PageAuditResult>
 }

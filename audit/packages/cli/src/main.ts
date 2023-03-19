@@ -76,7 +76,7 @@ class GitCodeFetcher implements CodeFetcher {
   const codeFetcher = new GitCodeFetcher(config.githubUrl);
   const scrapper = new PuppeteerPageScrapper();
   const auditor = new PageAudit(scrapper, codeFetcher, config.outputs ?? []);
-  await auditor.audit(config.urls);
+  await auditor.audit(config);
   scrapper.tearDown();
   process.exit(0);
 })();
