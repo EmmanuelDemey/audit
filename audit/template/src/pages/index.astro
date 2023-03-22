@@ -1,5 +1,6 @@
 ---
-import Demo from '../components/demo'
+import Report from '../components/report'
+import data from './data.json';
 ---
 
 <html lang="en">
@@ -11,6 +12,6 @@ import Demo from '../components/demo'
 		<title>Astro</title>
 	</head>
 	<body>
-		<Demo />
+		<Report report={data}/>
 	</body>
 </html>
