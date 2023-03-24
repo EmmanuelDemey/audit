@@ -12,15 +12,23 @@ class PuppeteerPageScrapper implements WebPageScrapper {
   tab: Page;
 
   async getInstance() {
-    if (this.browser !== null) {
+    if (this.tab !== null) {
       this.browser = await puppeteer.launch();
+      this.tab = await this.browser.newPage();
     }
-    return this.browser;
+    return this.tab;
   }
 
+  async getLinks(url: string): Promise<string[]>{
+    await this.getInstance();
+    await this.tab.goto(url)
+    
+    return this.tab.evaluate(() => {
+      return Array.from(document.querySelectorAll("a[href]")).map((link: HTMLLinkElement) => link.href);
+    })
+  }
   async visit(url: string) {
     await this.getInstance();
-    this.tab = await this.browser.newPage();
     await this.tab.goto(url);
   }
 

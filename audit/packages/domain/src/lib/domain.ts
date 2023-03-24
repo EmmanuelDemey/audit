@@ -44,18 +44,49 @@ export class PageAudit implements Audit  {
 
     pageAuditResult.rulesResult = results;
 
-
-
     return pageAuditResult;
   }
+
+  private async fetchAllLinks(links: Set<string>, acc: Set<string>): Promise<Set<string>> {
+    if(!links || links.size === 0){
+      return acc;
+    }
+
+    const addLink = (url): void => {
+      const formattedUrl = new URL(url);
+      if(!Array.from(acc).find(a => a === `${formattedUrl.origin}${formattedUrl.pathname}`)){
+        foundLinks.add(`${formattedUrl.origin}${formattedUrl.pathname}`)
+      }
+    }
+    const foundLinks: Set<string> = new Set();
+    for (const link of links.values()) {
+      const urls = await this.scrapper.getLinks(link);
+      urls?.forEach(url => {
+        if(url.endsWith('pdf')){
+          return;
+        }
+        if(acc.size > 0 && Array.from(acc).find(a => (new URL(a).hostname) === (new URL(url).hostname))){
+         addLink(url)
+        }
+        if(acc.size === 0 && Array.from(links).find(a => (new URL(a).hostname) === (new URL(url).hostname))){
+          addLink(url)
+        }
+      })
+    }
+
+    const newAcc = new Set([...acc, ...foundLinks]);
+    return this.fetchAllLinks(foundLinks, newAcc)
+  }
   async audit(config: AuditConfig) {
-    const urls = config.urls;
+    const urls = new Set(config.urls);
     const codePath = await this.codeFetcher.fetch();
     console.log(codePath)
 
     const results: AuditResults = {};
 
-    for(const url of urls){
+    const fetchedUrls = await await this.fetchAllLinks(urls, new Set());
+
+    for(const url of fetchedUrls){
       await this.scrapper.visit(url);
       results[url] = await this.auditExternalWebPage(config);
     }

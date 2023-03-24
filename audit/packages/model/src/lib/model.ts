@@ -10,6 +10,7 @@ export interface WebPageScrapper {
   tearDown: () => void;
   getExternalJavaScript: () => Promise<string[]>;
   getExternalCSS: () => Promise<string[]>;
+  getLinks: (link: string) => Promise<string[]>
 }
 
 export type RuleFactory = {
