@@ -16,14 +16,16 @@ export class PageAudit implements Audit  {
       this.scrapper.getHomePageTitle(),
       this.scrapper.getLang(),
       this.scrapper.getExternalJavaScript(),
-      this.scrapper.getExternalCSS()
-    ]).then(([ title, lang, scripts, links]) => {
+      this.scrapper.getExternalCSS(),
+      this.scrapper.getAccessibilityTree()
+    ]).then(([ title, lang, scripts, links, accessibilityTree]) => {
       pageAuditResult.title = title;
       pageAuditResult.lang = lang;
       pageAuditResult.scripts = scripts;
       pageAuditResult.links = links;
+      pageAuditResult.accessibilityTree = accessibilityTree
     })
-
+    console.log(pageAuditResult)
     const results: { [ruleName: string]: RuleResult } = await Promise.all(
       rules
       .map(rule => rule())

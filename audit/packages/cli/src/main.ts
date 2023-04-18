@@ -1,6 +1,6 @@
 import { mkdirSync, rmSync } from 'fs';
 import { resolve } from 'path';
-import puppeteer, { Browser, Page } from 'puppeteer';
+import puppeteer, { Browser, Page, SerializedAXNode } from 'puppeteer';
 import { simpleGit, SimpleGit } from 'simple-git';
 import { PageAudit } from '@audit/domain';
 import { WebPageScrapper, CodeFetcher, AuditConfig } from '@audit/model';
@@ -19,6 +19,8 @@ class PuppeteerPageScrapper implements WebPageScrapper {
     return this.tab;
   }
 
+  
+
   async getLinks(url: string): Promise<string[]>{
     await this.getInstance();
     await this.tab.goto(url)
@@ -30,6 +32,10 @@ class PuppeteerPageScrapper implements WebPageScrapper {
   async visit(url: string) {
     await this.getInstance();
     await this.tab.goto(url);
+  }
+
+  async getAccessibilityTree(): Promise<SerializedAXNode> {
+    return this.tab.accessibility.snapshot()
   }
 
   getHomePageTitle(): Promise<string> {

@@ -10,7 +10,8 @@ export interface WebPageScrapper {
   tearDown: () => void;
   getExternalJavaScript: () => Promise<string[]>;
   getExternalCSS: () => Promise<string[]>;
-  getLinks: (link: string) => Promise<string[]>
+  getLinks: (link: string) => Promise<string[]>;
+  getAccessibilityTree: () => Promise<any>
 }
 
 export type RuleFactory = {
@@ -43,6 +44,7 @@ export interface PageAuditResult {
   scripts?: string[];
   links?: string[];
   rulesResult?: { [ruleName: string]: RuleResult };
+  accessibilityTree?: any;
 }
 
 export type AuditResults = { [url: string]: PageAuditResult };
