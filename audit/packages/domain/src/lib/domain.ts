@@ -1,8 +1,10 @@
-import {RuleResult, WebPageScrapper, Audit, PageAuditResult, AuditResults, CodeFetcher, Output, RuleFactoryAndResult, AuditConfig} from "@audit/model"
+import {RuleResult, FileSystemScrapper, WebPageScrapper, Audit, PageAuditResult, AuditResults, CodeFetcher, Output, RuleFactoryAndResult, AuditConfig} from "@audit/model"
 import {rules} from '@audit/rules';
+import { resolve } from "path";
+import { cwd } from "process";
 
 export class PageAudit implements Audit  {
-  constructor(private readonly scrapper: WebPageScrapper, private readonly codeFetcher: CodeFetcher, private readonly outputs: Output[]) {}
+  constructor(private readonly scrapper: WebPageScrapper, private fileSystemScrapper: FileSystemScrapper, private readonly codeFetcher: CodeFetcher, private readonly outputs: Output[]) {}
 
   private async auditExternalWebPage(config: AuditConfig) {
     const pageAuditResult: PageAuditResult = {};
@@ -83,14 +85,16 @@ export class PageAudit implements Audit  {
     const urls = new Set(config.urls);
     const codePath = await this.codeFetcher.fetch();
     console.log(codePath)
+    const results: AuditResults = { fs: {}, webpages: {} };
 
-    const results: AuditResults = {};
+    const hasGithubAction = await this.fileSystemScrapper.isFileExisting(resolve(cwd(), codePath, '.github'));
+    results.fs.hasGithubAction = hasGithubAction;
 
     const fetchedUrls = await await this.fetchAllLinks(urls, new Set());
 
     for(const url of fetchedUrls){
       await this.scrapper.visit(url);
-      results[url] = await this.auditExternalWebPage(config);
+      results.webpages[url] = await this.auditExternalWebPage(config);
     }
     
     this.outputs.forEach(output => output.convert(results))

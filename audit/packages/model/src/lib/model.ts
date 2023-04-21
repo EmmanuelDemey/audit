@@ -47,10 +47,19 @@ export interface PageAuditResult {
   accessibilityTree?: any;
 }
 
-export type AuditResults = { [url: string]: PageAuditResult };
+export type AuditResults = {
+  fs?: {
+    hasGithubAction?: boolean
+  }
+  webpages?: { [url: string]: PageAuditResult }
+};
 
 
 
 export interface Audit {
-  audit: (config: AuditConfig) => Promise<PageAuditResult>
+  audit: (config: AuditConfig) => Promise<AuditResults>
+}
+
+export interface FileSystemScrapper {
+  isFileExisting(path: string): Promise<boolean>;
 }

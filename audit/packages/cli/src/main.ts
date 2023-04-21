@@ -3,8 +3,8 @@ import { resolve } from 'path';
 import puppeteer, { Browser, Page, SerializedAXNode } from 'puppeteer';
 import { simpleGit, SimpleGit } from 'simple-git';
 import { PageAudit } from '@audit/domain';
-import { WebPageScrapper, CodeFetcher, AuditConfig } from '@audit/model';
-
+import { WebPageScrapper, CodeFetcher, AuditConfig, FileSystemScrapper } from '@audit/model';
+import { existsSync } from 'fs';
 
 class PuppeteerPageScrapper implements WebPageScrapper {
   
@@ -76,20 +76,30 @@ class GitCodeFetcher implements CodeFetcher {
     mkdirSync(this.tempFolder, { recursive: true})
     this.git = simpleGit();
   }
-  fetch(): Promise<string> {
-    return this.git.clone(this.url, this.tempFolder, {
+  async fetch(): Promise<string> {
+    await this.git.clone(this.url, this.tempFolder, {
       '--depth': 1,
     });
+    return this.tempFolder;
   }
 }
 
+
+
+class DefaultFileSystemScrapper implements FileSystemScrapper {
+  isFileExisting(path: string): Promise<boolean> {
+    return Promise.resolve(existsSync(path));
+  }
+
+}
 
 (async () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const config: AuditConfig = require(resolve(process.cwd(), 'audit.config.js'));
   const codeFetcher = new GitCodeFetcher(config.githubUrl);
   const scrapper = new PuppeteerPageScrapper();
-  const auditor = new PageAudit(scrapper, codeFetcher, config.outputs ?? []);
+  const fileScrapper = new DefaultFileSystemScrapper();
+  const auditor = new PageAudit(scrapper, fileScrapper, codeFetcher, config.outputs ?? []);
   await auditor.audit(config);
   scrapper.tearDown();
   process.exit(0);
