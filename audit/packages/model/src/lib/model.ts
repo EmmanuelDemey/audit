@@ -49,7 +49,8 @@ export interface PageAuditResult {
 
 export type AuditResults = {
   fs?: {
-    hasGithubAction?: boolean
+    hasGithubAction?: boolean,
+    hasSonarPropertiesFile?: boolean
   }
   webpages?: { [url: string]: PageAuditResult }
 };

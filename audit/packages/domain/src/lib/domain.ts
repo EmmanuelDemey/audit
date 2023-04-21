@@ -88,7 +88,9 @@ export class PageAudit implements Audit  {
     const results: AuditResults = { fs: {}, webpages: {} };
 
     const hasGithubAction = await this.fileSystemScrapper.isFileExisting(resolve(cwd(), codePath, '.github'));
+    const hasSonarPropertiesFile = await this.fileSystemScrapper.isFileExisting(resolve(cwd(), codePath, 'sonar-project.properties'));
     results.fs.hasGithubAction = hasGithubAction;
+    results.fs.hasSonarPropertiesFile = hasSonarPropertiesFile;
 
     const fetchedUrls = await await this.fetchAllLinks(urls, new Set());
 
