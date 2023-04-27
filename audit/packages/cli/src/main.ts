@@ -63,7 +63,7 @@ class PuppeteerPageScrapper implements WebPageScrapper {
     );
   }
   tearDown(): void {
-    this.browser.close();
+    //this.browser.close();
   }
 }
 

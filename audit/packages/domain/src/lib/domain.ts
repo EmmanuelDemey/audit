@@ -82,9 +82,8 @@ export class PageAudit implements Audit  {
     return this.fetchAllLinks(foundLinks, newAcc)
   }
   async audit(config: AuditConfig) {
-    const urls = new Set(config.urls);
+    /*const urls = new Set(config.urls);
     const codePath = await this.codeFetcher.fetch();
-    console.log(codePath)
     const results: AuditResults = { fs: {}, webpages: {} };
 
     const hasGithubAction = await this.fileSystemScrapper.isFileExisting(resolve(cwd(), codePath, '.github'));
@@ -98,9 +97,9 @@ export class PageAudit implements Audit  {
       await this.scrapper.visit(url);
       results.webpages[url] = await this.auditExternalWebPage(config);
     }
-    
-    this.outputs.forEach(output => output.convert(results))
+    */
+    this.outputs.forEach(output => output.convert({}))
 
-    return results;
+    return {};
   }
 }
