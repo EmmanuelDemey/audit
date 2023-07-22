@@ -18,7 +18,7 @@ class AstroOutput {
     }
   }
   convert() {
-    fse.copySync('./template', this.distFolder, { overwrite: true });
+    execSync(`npm create astro@latest -- ${this.distFolder} --template starlight --install --no-git --typescript strict`, { stdio: 'inherit'})
     if (!!this.launch) {
       execSync(`npm --prefix ${this.distFolder} run dev`, { stdio: 'inherit'});
     }
