@@ -1,6 +1,5 @@
 import {
   WebPageScrapper,
-  RuleResult,
   CATEGORIES,
   RuleFactory,
 } from '@audit/model';

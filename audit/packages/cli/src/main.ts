@@ -1,9 +1,9 @@
 import { mkdirSync, rmSync } from 'fs';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import puppeteer, { Browser, Page, SerializedAXNode } from 'puppeteer';
 import { simpleGit, SimpleGit } from 'simple-git';
 import { PageAudit } from '@audit/domain';
-import { WebPageScrapper, CodeFetcher, AuditConfig, FileSystemScrapper } from '@audit/model';
+import { WebPageScrapper, CodeFetcher, AuditConfig, FileSystemScrapper, PACKAGE_MANAGER } from '@audit/model';
 import { existsSync } from 'fs';
 
 class PuppeteerPageScrapper implements WebPageScrapper {
@@ -87,10 +87,20 @@ class GitCodeFetcher implements CodeFetcher {
 
 
 class DefaultFileSystemScrapper implements FileSystemScrapper {
+  getPackageManager(root: string): Promise<PACKAGE_MANAGER> {
+
+    
+  return Promise.resolve([
+      ['package-lock.json', 'npm'],
+      ['yarn.lock', 'yarn'],
+      ['pnpm-lock.yaml', 'pnpm'],
+      ['pom.xml', 'maven'],
+      ['build.gradle', 'gradle']
+    ].find(([file]) => existsSync(join(root, file)))?.[1] as PACKAGE_MANAGER)
+  }
   isFileExisting(path: string): Promise<boolean> {
     return Promise.resolve(existsSync(path));
   }
-
 }
 
 (async () => {

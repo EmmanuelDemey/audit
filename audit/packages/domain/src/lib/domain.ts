@@ -82,7 +82,7 @@ export class PageAudit implements Audit  {
     return this.fetchAllLinks(foundLinks, newAcc)
   }
   async audit(config: AuditConfig) {
-    /*const urls = new Set(config.urls);
+    const urls = new Set(config.urls);
     const codePath = await this.codeFetcher.fetch();
     const results: AuditResults = { fs: {}, webpages: {} };
 
@@ -90,6 +90,7 @@ export class PageAudit implements Audit  {
     const hasSonarPropertiesFile = await this.fileSystemScrapper.isFileExisting(resolve(cwd(), codePath, 'sonar-project.properties'));
     results.fs.hasGithubAction = hasGithubAction;
     results.fs.hasSonarPropertiesFile = hasSonarPropertiesFile;
+    results.fs.packageManager = await this.fileSystemScrapper.getPackageManager(resolve(cwd(), codePath, 'audit'));
 
     const fetchedUrls = await await this.fetchAllLinks(urls, new Set());
 
@@ -97,7 +98,7 @@ export class PageAudit implements Audit  {
       await this.scrapper.visit(url);
       results.webpages[url] = await this.auditExternalWebPage(config);
     }
-    */
+    
     this.outputs.forEach(output => output.convert({}))
 
     return {};
