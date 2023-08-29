@@ -5,6 +5,7 @@ import { simpleGit, SimpleGit } from 'simple-git';
 import { PageAudit } from '@audit/domain';
 import { WebPageScrapper, CodeFetcher, AuditConfig, FileSystemScrapper, PACKAGE_MANAGER } from '@audit/model';
 import { existsSync } from 'fs';
+import { text } from '@clack/prompts';
 
 class PuppeteerPageScrapper implements WebPageScrapper {
   
@@ -105,12 +106,33 @@ class DefaultFileSystemScrapper implements FileSystemScrapper {
 
 (async () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const config: AuditConfig = require(resolve(process.cwd(), 'audit.config.js'));
+  const configurationFile = resolve(process.cwd(), 'audit.config.js2');
+
+  let config: Partial<AuditConfig> = {};
+  if(existsSync(configurationFile)){
+    config = require(configurationFile);
+  } else {
+
+    const url = await text({
+      message: "URL of the website you want to audit"
+    });
+    config.urls = [url as string];
+
+    const githubUrl = await text({
+      message: "URL vers le repository Git"
+    });
+    config.githubUrl = githubUrl as string;
+    config.excludes = []
+  }
   const codeFetcher = new GitCodeFetcher(config.githubUrl);
   const scrapper = new PuppeteerPageScrapper();
   const fileScrapper = new DefaultFileSystemScrapper();
-  const auditor = new PageAudit(scrapper, fileScrapper, codeFetcher, config.outputs ?? []);
-  await auditor.audit(config);
+  const auditor = new PageAudit(scrapper, fileScrapper, codeFetcher, config.outputs ?? [{
+    convert(result) {
+      console.log(JSON.stringify(result, null, 4));
+    }
+  }]);
+  await auditor.audit(config as AuditConfig);
   scrapper.tearDown();
   process.exit(0);
 })();

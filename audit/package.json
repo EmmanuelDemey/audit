@@ -5,6 +5,7 @@
   "scripts": {},
   "private": true,
   "dependencies": {
+    "@clack/prompts": "^0.7.0",
     "axios": "^1.0.0",
     "fs-extra": "^11.1.0",
     "puppeteer": "^19.7.3",
