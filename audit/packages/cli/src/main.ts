@@ -1,9 +1,9 @@
-import { mkdirSync, rmSync } from 'fs';
+import { mkdirSync, readFileSync, rmSync } from 'fs';
 import { join, resolve } from 'path';
 import puppeteer, { Browser, Page, SerializedAXNode } from 'puppeteer';
 import { simpleGit, SimpleGit } from 'simple-git';
 import { PageAudit } from '@audit/domain';
-import { WebPageScrapper, CodeFetcher, AuditConfig, FileSystemScrapper, PACKAGE_MANAGER } from '@audit/model';
+import { WebPageScrapper, CodeFetcher, AuditConfig, FileSystemScrapper, PACKAGE_MANAGER, FRAMEWORK } from '@audit/model';
 import { existsSync } from 'fs';
 import { text } from '@clack/prompts';
 
@@ -26,9 +26,11 @@ class PuppeteerPageScrapper implements WebPageScrapper {
     await this.getInstance();
     await this.tab.goto(url)
     
-    return this.tab.evaluate(() => {
+    return Promise.resolve([])
+    // TODO disabled for now because to long
+    /*return this.tab.evaluate(() => {
       return Array.from(document.querySelectorAll("a[href]")).map((link: HTMLLinkElement) => link.href);
-    })
+    })*/
   }
   async visit(url: string) {
     await this.getInstance();
@@ -88,10 +90,26 @@ class GitCodeFetcher implements CodeFetcher {
 
 
 class DefaultFileSystemScrapper implements FileSystemScrapper {
-  getPackageManager(root: string): Promise<PACKAGE_MANAGER> {
+  getFramework(root: string): Promise<FRAMEWORK> {
+    if(existsSync(join(root, 'package.json'))){
+      const pck: any = JSON.parse(readFileSync(join(root, 'package.json')).toString());
+      let framework: FRAMEWORK | undefined;
 
-    
-  return Promise.resolve([
+      const dependencies = Object.keys(pck.dependencies);
+      if(dependencies.includes('@angular/core')){
+        framework = 'angular'
+      }
+      if(dependencies.includes('react')){
+        framework = 'react'
+      }
+
+      return Promise.resolve(framework)
+    }
+    return Promise.resolve(undefined)
+  }
+
+  getPackageManager(root: string): Promise<PACKAGE_MANAGER> {
+    return Promise.resolve([
       ['package-lock.json', 'npm'],
       ['yarn.lock', 'yarn'],
       ['pnpm-lock.yaml', 'pnpm'],
@@ -99,6 +117,7 @@ class DefaultFileSystemScrapper implements FileSystemScrapper {
       ['build.gradle', 'gradle']
     ].find(([file]) => existsSync(join(root, file)))?.[1] as PACKAGE_MANAGER)
   }
+
   isFileExisting(path: string): Promise<boolean> {
     return Promise.resolve(existsSync(path));
   }
@@ -106,7 +125,7 @@ class DefaultFileSystemScrapper implements FileSystemScrapper {
 
 (async () => {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const configurationFile = resolve(process.cwd(), 'audit.config.js2');
+  const configurationFile = resolve(process.cwd(), 'audit.config.js');
 
   let config: Partial<AuditConfig> = {};
   if(existsSync(configurationFile)){

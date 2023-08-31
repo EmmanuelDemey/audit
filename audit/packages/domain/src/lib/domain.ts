@@ -90,8 +90,12 @@ export class PageAudit implements Audit  {
     const hasSonarPropertiesFile = await this.fileSystemScrapper.isFileExisting(resolve(cwd(), codePath, 'sonar-project.properties'));
     results.fs.hasGithubAction = hasGithubAction;
     results.fs.hasSonarPropertiesFile = hasSonarPropertiesFile;
-    results.fs.packageManager = await this.fileSystemScrapper.getPackageManager(resolve(cwd(), codePath, 'audit'));
 
+    //TODO to be deleted the audit
+    results.fs.packageManager = await this.fileSystemScrapper.getPackageManager(resolve(cwd(), codePath, 'audit'));
+    results.fs.framework = await this.fileSystemScrapper.getFramework(resolve(cwd(), codePath, 'audit'))
+    
+    console.log(results)
     const fetchedUrls = await await this.fetchAllLinks(urls, new Set());
 
     for(const url of fetchedUrls){

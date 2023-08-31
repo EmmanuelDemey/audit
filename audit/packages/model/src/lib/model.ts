@@ -52,6 +52,7 @@ export type AuditResults = {
     hasGithubAction?: boolean,
     hasSonarPropertiesFile?: boolean
     packageManager?: PACKAGE_MANAGER
+    framework?: FRAMEWORK
   }
   webpages?: { [url: string]: PageAuditResult }
 };
@@ -63,8 +64,10 @@ export interface Audit {
 }
 
 export type PACKAGE_MANAGER = 'npm' | 'yarn' | 'pnpm' | 'maven' | 'gradle' | undefined
+export type FRAMEWORK = 'react' | 'angular' | undefined
 export interface FileSystemScrapper {
   isFileExisting(path: string): Promise<boolean>;
   
   getPackageManager(root: string): Promise<PACKAGE_MANAGER>
+  getFramework(root: string): Promise<FRAMEWORK>
 }

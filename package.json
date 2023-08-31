@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@clack/prompts": "^0.7.0"
+  }
+}
