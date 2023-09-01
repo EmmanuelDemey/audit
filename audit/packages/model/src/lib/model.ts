@@ -1,5 +1,6 @@
 export enum CATEGORIES {
   ACCESSIBILITY = 'ACCESSIBILITY',
+  QUALITY = 'QUALITY',
 }
 
 export interface WebPageScrapper {
@@ -17,7 +18,8 @@ export interface WebPageScrapper {
 export type RuleFactory = {
   categories: CATEGORIES[]; 
   links?: string[];
-  check: (scrapper: WebPageScrapper) => Promise<boolean>
+  check?: (scrapper: WebPageScrapper) => Promise<boolean>
+  staticCheck?: (scrapper: FileSystemScrapper) => Promise<boolean>
 }
 
 export type RuleResult = { valid: boolean };

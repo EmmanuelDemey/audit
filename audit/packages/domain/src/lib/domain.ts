@@ -27,13 +27,14 @@ export class PageAudit implements Audit  {
       pageAuditResult.links = links;
       pageAuditResult.accessibilityTree = accessibilityTree
     })
-    console.log(pageAuditResult)
+    
     const results: { [ruleName: string]: RuleResult } = await Promise.all(
       rules
       .map(rule => rule())
       .filter(rule => {
         return rule.categories.filter(category => config.excludes.indexOf(category) < 0 ).length > 0
       })
+      .filter(factory => !!factory.check)
       .map(factory => {
         return factory.check(this.scrapper).then(result => ({ ...factory, valid: result }))
       })
@@ -95,7 +96,6 @@ export class PageAudit implements Audit  {
     results.fs.packageManager = await this.fileSystemScrapper.getPackageManager(resolve(cwd(), codePath, 'audit'));
     results.fs.framework = await this.fileSystemScrapper.getFramework(resolve(cwd(), codePath, 'audit'))
     
-    console.log(results)
     const fetchedUrls = await await this.fetchAllLinks(urls, new Set());
 
     for(const url of fetchedUrls){
