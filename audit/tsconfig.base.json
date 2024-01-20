@@ -10,16 +10,11 @@
     "importHelpers": true,
     "target": "es2015",
     "module": "esnext",
-    "lib": ["es2017", "dom"],
+    "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {
-      "@audit/domain": ["packages/domain/src/index.ts"],
-      "@audit/exporter-logger": ["packages/exporter-logger/src/index.ts"],
-      "@audit/model": ["packages/model/src/index.ts"],
-      "@audit/rules": ["packages/rules/src/index.ts"]
-    }
+    "paths": {}
   },
   "exclude": ["node_modules", "tmp"]
 }
