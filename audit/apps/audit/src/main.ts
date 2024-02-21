@@ -1,9 +1,8 @@
 #! /usr/bin/env node
 
-const puppeteer = require('puppeteer');
-
-const { program } = require('commander');
-const { exists } = require('fs');
+import puppeteer from 'puppeteer';
+import { program } from 'commander';
+import { z } from 'zod';
 
 program.name('audit').version('0.0.0');
 
@@ -17,17 +16,17 @@ const getStatistics = async (url: string): Promise<PageStatistics> => {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
-  let requestsNumber: number = 0;
-  let pageSize: number = 0;
+  let requestsNumber = 0;
+  let pageSize = 0;
 
   // Écouter les événements de requête pour compter le nombre total de requêtes et calculer le poids total de la page.
-  page.on('request', (request) => {
+  page.on('request', () => {
     requestsNumber++;
   });
 
   page.on('response', async (response) => {
     const responseHeaders = response.headers();
-    let responseSize: number = parseInt(responseHeaders['content-length'], 10);
+    const responseSize = parseInt(responseHeaders['content-length'], 10);
     if (!isNaN(responseSize)) {
       pageSize += responseSize;
     }
@@ -52,10 +51,14 @@ program
   .command('audit')
   .argument('<string...>', 'url to audit')
   .option('--path <char>', 'path to a folder container the project')
-  .action(async (urlString, options) => {
+  .action(async (urlString) => {
+    const validation = z.array(z.string().url()).safeParse(urlString);
+
+    if (!validation.success) {
+      throw new Error(`La liste doit être ue liste d'URL valides`);
+    }
     try {
-      //const url = new URL(urlString);
-      for (let url of urlString) {
+      for (const url of urlString) {
         const stats = await getStatistics(url);
         console.log(stats);
       }
