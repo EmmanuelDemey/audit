@@ -3,6 +3,9 @@
 import puppeteer from 'puppeteer';
 import { program } from 'commander';
 import { z } from 'zod';
+import { fdir } from 'fdir';
+import { parse } from 'yaml';
+import { readFileSync } from 'fs';
 
 program.name('audit').version('0.0.0');
 
@@ -10,6 +13,7 @@ type PageStatistics = {
   requestsNumber: number;
   pageSize: number;
   domComplexity: number;
+  urls: Set<string>;
 };
 
 const getStatistics = async (url: string): Promise<PageStatistics> => {
@@ -19,8 +23,11 @@ const getStatistics = async (url: string): Promise<PageStatistics> => {
   let requestsNumber = 0;
   let pageSize = 0;
 
+  const urls = new Set<string>();
+
   // Écouter les événements de requête pour compter le nombre total de requêtes et calculer le poids total de la page.
-  page.on('request', () => {
+  page.on('request', (request) => {
+    urls.add(request.url());
     requestsNumber++;
   });
 
@@ -44,26 +51,56 @@ const getStatistics = async (url: string): Promise<PageStatistics> => {
     domComplexity,
     pageSize,
     requestsNumber,
+    urls,
   };
 };
 
 program
   .command('audit')
-  .argument('<string...>', 'url to audit')
+  .option('-u, --url <string...>', 'urls to audit')
+  .option('-c, --config <char>', 'path to a config file')
   .option('--path <char>', 'path to a folder container the project')
-  .action(async (urlString) => {
-    const validation = z.array(z.string().url()).safeParse(urlString);
+  .action(async function () {
+    let config: { urls: string } = {
+      urls: this.opts().url,
+    };
+    if (this.opts().config) {
+      config = {
+        ...parse(readFileSync(this.opts().config, 'utf8')),
+      };
+    }
+
+    console.log(config);
+    const validation = z
+      .object({
+        urls: z.array(z.string().url()),
+      })
+      .safeParse(config);
 
     if (!validation.success) {
       throw new Error(`La liste doit être ue liste d'URL valides`);
     }
+    const api = new fdir()
+      .filter(
+        (path) =>
+          !path.includes('node_modules') &&
+          !path.includes('.nx') &&
+          !path.includes('dist')
+      )
+      .filter((path) => path.endsWith('package.json'))
+      .withFullPaths()
+      .crawl('.');
+
+    const jsonPackages = api.sync();
+    console.log(jsonPackages);
+
     try {
-      for (const url of urlString) {
+      for (const url of config.urls) {
         const stats = await getStatistics(url);
         console.log(stats);
       }
     } catch (e) {
-      console.error(`The url ${urlString} is not a valid URL`);
+      console.error(e);
       process.exit(1);
     }
   });
