@@ -5,9 +5,14 @@ import { program } from 'commander';
 import { z } from 'zod';
 import { fdir } from 'fdir';
 import { parse } from 'yaml';
-import { readFileSync } from 'fs';
+import { readFileSync, stat } from 'fs';
 
 program.name('audit').version('0.0.0');
+
+const nodePackageManager = {
+  'package-lock.json': 'npm',
+  'yarn.lock': 'yarn',
+};
 
 type PageStatistics = {
   requestsNumber: number;
@@ -55,6 +60,15 @@ const getStatistics = async (url: string): Promise<PageStatistics> => {
   };
 };
 
+type PageAuditUrl = {
+  stats: PageStatistics;
+};
+type AuditResult = {
+  packageManagerConfigFilePaths?: string[];
+  packageManager?: string[];
+  urls?: Record<string, PageAuditUrl>;
+};
+
 program
   .command('audit')
   .option('-u, --url <string...>', 'urls to audit')
@@ -70,7 +84,10 @@ program
       };
     }
 
-    console.log(config);
+    const audit: AuditResult = {
+      urls: {},
+    };
+
     const validation = z
       .object({
         urls: z.array(z.string().url()),
@@ -80,29 +97,58 @@ program
     if (!validation.success) {
       throw new Error(`La liste doit être ue liste d'URL valides`);
     }
-    const api = new fdir()
+
+    const crawler = new fdir().filter(
+      (path) =>
+        !path.includes('node_modules') &&
+        !path.includes('.nx') &&
+        !path.includes('tmp') &&
+        !path.includes('dist')
+    );
+
+    audit.packageManagerConfigFilePaths = crawler
+      .filter((path) => path.endsWith('package.json'))
+      .withFullPaths()
+      .crawl('.')
+      .sync();
+
+    audit.packageManager = new fdir()
       .filter(
         (path) =>
           !path.includes('node_modules') &&
           !path.includes('.nx') &&
+          !path.includes('tmp') &&
           !path.includes('dist')
       )
-      .filter((path) => path.endsWith('package.json'))
+      .filter(
+        (path) =>
+          !!Object.keys(nodePackageManager).find((lock) => {
+            return path.endsWith(lock);
+          })
+      )
       .withFullPaths()
-      .crawl('.');
-
-    const jsonPackages = api.sync();
-    console.log(jsonPackages);
+      .crawl('.')
+      .sync()
+      .map((path) => {
+        return Object.entries(nodePackageManager).find(
+          ([file]: [string, string]) => {
+            return path.endsWith(file);
+          }
+        )[1];
+      })
+      .filter((packageManager) => !!packageManager);
 
     try {
       for (const url of config.urls) {
         const stats = await getStatistics(url);
-        console.log(stats);
+        audit.urls[url] = { stats };
       }
     } catch (e) {
       console.error(e);
       process.exit(1);
     }
+
+    console.log(audit);
   });
 
 program.parse();
