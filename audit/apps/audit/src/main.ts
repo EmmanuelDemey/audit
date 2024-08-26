@@ -5,7 +5,8 @@ import { program } from 'commander';
 import { z } from 'zod';
 import { fdir } from 'fdir';
 import { parse } from 'yaml';
-import { readFileSync, stat } from 'fs';
+import { readFileSync } from 'fs';
+import { execSync } from 'child_process';
 
 program.name('audit').version('0.0.0');
 
@@ -66,6 +67,16 @@ type PageAuditUrl = {
 type AuditResult = {
   packageManagerConfigFilePaths?: string[];
   packageManager?: string[];
+  outdated?: Record<
+    string,
+    {
+      current: string;
+      wanted: string;
+      latest: string;
+      dependent: string;
+      location: string;
+    }
+  >;
   urls?: Record<string, PageAuditUrl>;
 };
 
@@ -138,6 +149,16 @@ program
       })
       .filter((packageManager) => !!packageManager);
 
+    if (
+      audit.packageManager.includes('npm') ||
+      audit.packageManager.includes('yarn')
+    ) {
+      try {
+        execSync(`npm --prefix . outdated --json`);
+      } catch (e) {
+        audit.outdated = JSON.parse(e.stdout.toString());
+      }
+    }
     try {
       for (const url of config.urls) {
         const stats = await getStatistics(url);
@@ -150,5 +171,6 @@ program
 
     console.log(audit);
   });
+
 
 program.parse();
