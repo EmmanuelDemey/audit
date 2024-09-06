@@ -1,3 +1,3 @@
-only-parser: false
+only-parser: true
 urls:
   - https://www.emmanueldemey.dev/

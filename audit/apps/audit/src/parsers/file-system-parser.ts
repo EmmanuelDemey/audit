@@ -7,6 +7,23 @@ const nodePackageManager = {
   'yarn.lock': 'yarn',
 };
 
+const isTypescriptProject: Parser = (rootPath) => {
+  const files = new fdir()
+    .filter(
+      (path) =>
+        !path.includes('node_modules') &&
+        !path.includes('.nx') &&
+        !path.includes('tmp') &&
+        !path.includes('dist')
+    )
+    .filter((path) => path.endsWith('tsconfig.json'))
+    .withFullPaths()
+    .crawl(rootPath)
+    .sync();
+
+  return { name: 'typescript', result: files.length > 0 };
+};
+
 const getPackageManagerConfigurationFilePath: Parser = (rootPath) => {
   const files = new fdir()
     .filter(
@@ -55,7 +72,11 @@ const getPackageManager: Parser = (rootPath) => {
 };
 
 export class FileSystemParser {
-  #parsers = [getPackageManagerConfigurationFilePath, getPackageManager];
+  #parsers = [
+    getPackageManagerConfigurationFilePath,
+    getPackageManager,
+    isTypescriptProject,
+  ];
   #crawler: any;
   constructor() {}
 
