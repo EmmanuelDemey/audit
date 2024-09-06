@@ -18,20 +18,13 @@ type AuditResult = {
 
 program
   .command('audit')
-  .option('-c, --config <char>', 'path to a config file')
-  .action(async function () {
-    let config: { urls: string } = {
-      urls: this.opts().url,
+  .argument('<string>', 'path to a config file')
+  .action(async function (configPath: string) {
+    const config = {
+      ...parse(readFileSync(configPath, 'utf8')),
     };
-    console.log(this.opts());
-    if (this.opts().config) {
-      console.log('YO', this.opts().config);
-      config = {
-        ...parse(readFileSync(this.opts().config, 'utf8')),
-      };
-    }
 
-    /*const validation = z
+    const validation = z
       .object({
         urls: z.array(z.string().url()),
       })
@@ -39,27 +32,30 @@ program
 
     if (!validation.success) {
       throw new Error(`La liste doit être ue liste d'URL valides`);
-    }*/
+    }
 
     const audit: AuditResult = {};
 
     const fileSystemParser = new FileSystemParser();
     audit.parsers = fileSystemParser.parse('.');
 
-    const fileSystemChecker = new FileSystemChecker(audit.parsers);
-    audit.syncChecks = fileSystemChecker.check();
+    if (!config['only-parser']) {
+      const fileSystemChecker = new FileSystemChecker(audit.parsers);
+      audit.syncChecks = fileSystemChecker.check();
 
-    if (config.urls) {
-      const httpChecker = new HttpChecker(audit.parsers);
+      console.log(config);
+      if (config.urls) {
+        const httpChecker = new HttpChecker(audit.parsers);
 
-      try {
-        audit.asyncChecks = {};
-        for (const url of config.urls) {
-          audit.asyncChecks[url] = await httpChecker.check(url);
+        try {
+          audit.asyncChecks = {};
+          for (const url of config.urls) {
+            audit.asyncChecks[url] = await httpChecker.check(url);
+          }
+        } catch (e) {
+          console.error(e);
+          process.exit(1);
         }
-      } catch (e) {
-        console.error(e);
-        process.exit(1);
       }
     }
 
