@@ -50,8 +50,22 @@ const getStatistics = async (
   };
 };
 
+const getImageWithoutAlts = async (url: string, _parsers: any) => {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto(url, { waitUntil: 'networkidle0' });
+
+  const imagesWithoutAlts = await page.evaluate(() =>
+    document.querySelectorAll('img:not([alt])')
+  );
+  console.log(imagesWithoutAlts);
+
+  if (imagesWithoutAlts.length > 0) {
+    return { name: 'imageWithoutAlts', result: imagesWithoutAlts.item };
+  }
+};
 export class HttpChecker {
-  #checkers: Checker[] = [getStatistics];
+  #checkers: Checker[] = [getStatistics, getImageWithoutAlts];
   constructor(private parsers: { name: string; result: any }[]) {}
   check(url: string) {
     return Promise.all(
