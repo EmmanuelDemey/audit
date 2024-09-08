@@ -77,7 +77,6 @@ export class FileSystemParser {
     getPackageManager,
     isTypescriptProject,
   ];
-  #crawler: any;
 
   parse(rootPath: string) {
     return this.#parsers.map((parser) => parser(rootPath));
