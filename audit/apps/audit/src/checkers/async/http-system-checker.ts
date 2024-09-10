@@ -2,8 +2,29 @@ import puppeteer from 'puppeteer';
 
 type Checker = (
   url: string,
-  parsers: { name: string; result: any }[]
-) => Promise<{ name: string; result: any } | undefined>;
+  parsers: { name: string; result: any }[],
+  requests?: Set<string>
+) => Promise<{ name: string; message?: string; result: any } | undefined>;
+
+const hasAtLeastOneAnalyticsTools = (
+  _url: string,
+  parsers: { name: string; result: any }[],
+  requests: Set<string>
+): Promise<{ name: string; result: any; message: string } | undefined> => {
+  const analytics = Array.from(requests).filter((request) =>
+    ['matomo.js', 'metricalp'].find((a) => request.includes(a))
+  );
+
+  if (analytics.length > 1) {
+    return Promise.resolve({
+      name: 'hasAtLeastOneAnalyticsTools',
+      result: analytics,
+      message: 'You have multiple analytics tools',
+    });
+  }
+
+  return Promise.resolve(undefined);
+};
 
 const getStatistics = async (
   url: string,
@@ -65,11 +86,17 @@ const getImageWithoutAlts = async (url: string, _parsers: any) => {
   }
 };
 export class HttpChecker {
-  #checkers: Checker[] = [getStatistics, getImageWithoutAlts];
+  #checkers: Checker[] = [getImageWithoutAlts, hasAtLeastOneAnalyticsTools];
   constructor(private parsers: { name: string; result: any }[]) {}
-  check(url: string) {
-    return Promise.all(
-      this.#checkers.map((checker) => checker(url, this.parsers))
+  async check(url: string) {
+    const statistics = await getStatistics(url, this.parsers);
+
+    const responses = await Promise.all(
+      this.#checkers.map((checker) =>
+        checker(url, this.parsers, statistics.result.urls)
+      )
     ).then((result) => result.filter((r) => !!r));
+
+    return [statistics, ...responses];
   }
 }
