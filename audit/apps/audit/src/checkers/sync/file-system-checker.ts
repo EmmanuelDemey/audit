@@ -1,6 +1,5 @@
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { string } from 'zod';
 
 type Checker = (
   parsers: { name: string; result: any }[]
@@ -27,14 +26,6 @@ const checkIfDevOrProdDependenciesPresent = (
       };
   });
   return result;
-};
-
-const checkIfDevDepenciesPresent = (path: string[], dependencyName: string) => {
-  return checkIfDevOrProdDependenciesPresent(path, dependencyName, true);
-};
-
-const checkIfDependenciesPresent = (path: string[], dependencyName: string) => {
-  return checkIfDevOrProdDependenciesPresent(path, dependencyName);
 };
 
 const generateDependenciesRule = (
@@ -67,7 +58,7 @@ const dependenciesCheck = [
   generateDependenciesRule('moment'),
   generateDependenciesRule('underscore'),
   generateDependenciesRule('underscore'),
-  generateDependenciesRule('karma'),
+  generateDependenciesRule('karma', true),
 ];
 
 const npmAudit = (parsers: { name: string; result: any }[]) => {
