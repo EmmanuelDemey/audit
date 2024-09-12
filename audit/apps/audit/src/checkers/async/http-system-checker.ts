@@ -1,17 +1,73 @@
-import puppeteer from 'puppeteer';
+import puppeteer, { Page } from 'puppeteer';
 
 type Checker = (
   url: string,
   parsers: { name: string; result: any }[],
-  requests?: Set<string>
+  { urls, page }?: { urls: Set<string>; page: Page }
 ) => Promise<{ name: string; message?: string; result: any } | undefined>;
 
-const hasAtLeastOneAnalyticsTools = (
+const hasValidDoctype: Checker = async (
   _url: string,
   parsers: { name: string; result: any }[],
-  requests: Set<string>
+  { page }: { page: Page }
 ): Promise<{ name: string; result: any; message: string } | undefined> => {
-  const analytics = Array.from(requests).filter((request) =>
+  const doctype = await page.evaluate(() => {
+    const node = document.doctype;
+    if (node) {
+      return {
+        name: node.name,
+        publicId: node.publicId,
+        systemId: node.systemId,
+      };
+    }
+    return null; // Si pas de doctype
+  });
+
+  if (!doctype) {
+    return Promise.resolve({
+      name: 'hasValidDoctype',
+      result: undefined,
+      message: 'You do not have a doctype',
+    });
+  }
+
+  if (
+    doctype.name !== 'html' ||
+    doctype.publicId !== '' ||
+    doctype.systemId !== ''
+  ) {
+    return Promise.resolve({
+      name: 'hasValidDoctype',
+      result: doctype,
+      message: 'You do not have a valide doctype',
+    });
+  }
+  return Promise.resolve(undefined);
+};
+
+const hasTitle: Checker = async (
+  _url: string,
+  parsers: { name: string; result: any }[],
+  { page }: { page: Page }
+): Promise<{ name: string; result: any; message: string } | undefined> => {
+  const title = await page.$eval('title', (elt) => elt.innerHTML);
+
+  if (!title) {
+    return Promise.resolve({
+      name: 'hasTitle',
+      result: undefined,
+      message: 'You must have one title',
+    });
+  }
+  return Promise.resolve(undefined);
+};
+
+const hasAtLeastOneAnalyticsTools: Checker = (
+  _url,
+  parsers,
+  { urls }
+): Promise<{ name: string; result: any; message: string } | undefined> => {
+  const analytics = Array.from(urls).filter((request) =>
     ['matomo.js', 'metricalp'].find((a) => request.includes(a))
   );
 
@@ -67,6 +123,7 @@ const getStatistics = async (
       pageSize,
       requestsNumber,
       urls,
+      page,
     },
   };
 };
@@ -86,15 +143,26 @@ const getImageWithoutAlts = async (url: string, _parsers: any) => {
   }
 };
 export class HttpChecker {
-  #checkers: Checker[] = [getImageWithoutAlts, hasAtLeastOneAnalyticsTools];
+  #checkers: Checker[] = [
+    getImageWithoutAlts,
+    hasAtLeastOneAnalyticsTools,
+    hasTitle,
+    hasValidDoctype,
+  ];
   constructor(private parsers: { name: string; result: any }[]) {}
   async check(url: string) {
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: 'networkidle0' });
     const statistics = await getStatistics(url, this.parsers);
 
     const responses = await Promise.all(
-      this.#checkers.map((checker) =>
-        checker(url, this.parsers, statistics.result.urls)
-      )
+      this.#checkers.map((checker) => {
+        return checker(url, this.parsers, {
+          urls: statistics.result.urls,
+          page,
+        });
+      })
     ).then((result) => result.filter((r) => !!r));
 
     return [statistics, ...responses];
