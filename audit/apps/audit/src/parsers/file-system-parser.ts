@@ -5,6 +5,8 @@ export type Parser = (responseootPath) => { name: string; result: any };
 const nodePackageManager = {
   'package-lock.json': 'npm',
   'yarn.lock': 'yarn',
+  'pnpm-lock.yaml': 'pnpm',
+  'bun.lockb': 'bun',
 };
 
 const isTypescriptProject: Parser = (rootPath) => {
