@@ -86,7 +86,7 @@ const getStatistics = async (
   url: string,
   parsers: { name: string; result: any }[]
 ): Promise<{ name: string; result: any }> => {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({ headless: 'new' });
   const page = await browser.newPage();
 
   let requestsNumber = 0;
@@ -129,7 +129,7 @@ const getStatistics = async (
 };
 
 const getImageWithoutAlts = async (url: string, _parsers: any) => {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({ headless: 'new' });
   const page = await browser.newPage();
   await page.goto(url, { waitUntil: 'networkidle0' });
 
@@ -151,7 +151,7 @@ export class HttpChecker {
   ];
   constructor(private parsers: { name: string; result: any }[]) {}
   async check(url: string) {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ headless: 'new' });
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'networkidle0' });
     const statistics = await getStatistics(url, this.parsers);

@@ -7,6 +7,7 @@ import { readFileSync } from 'fs';
 import { FileSystemParser } from './parsers/file-system-parser';
 import { FileSystemChecker } from './checkers/sync/file-system-checker';
 import { HttpChecker } from './checkers/async/http-system-checker';
+import yoctoSpinner from 'yocto-spinner';
 
 program.name('audit').version('0.0.0');
 
@@ -34,6 +35,8 @@ program
       throw new Error(`La liste doit être ue liste d'URL valides`);
     }
 
+    const spinner = yoctoSpinner({ text: 'Please wait...' }).start();
+
     const audit: AuditResult = {};
 
     const fileSystemParser = new FileSystemParser();
@@ -43,7 +46,6 @@ program
       const fileSystemChecker = new FileSystemChecker(audit.parsers);
       audit.syncChecks = fileSystemChecker.check();
 
-      console.log(config);
       if (config.urls) {
         const httpChecker = new HttpChecker(audit.parsers);
 
@@ -58,7 +60,7 @@ program
         }
       }
     }
-
+    spinner.success('Success!');
     console.log(JSON.stringify(audit));
   });
 
