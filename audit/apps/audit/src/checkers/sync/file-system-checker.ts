@@ -10,7 +10,7 @@ const checkIfDevOrProdDependenciesPresent = (
   devDependencies = false
 ) => {
   const result = {};
-  path.map((path) => {
+  path.forEach((path) => {
     const r = JSON.parse(readFileSync(path).toString());
     if (
       Object.keys(
@@ -87,7 +87,6 @@ const npmAudit = (parsers: { name: string; result: any }[]) => {
       return { name: 'npm_outdated', result: JSON.parse(e.stdout.toString()) };
     }
   }
-  return;
 };
 
 export class FileSystemChecker {
