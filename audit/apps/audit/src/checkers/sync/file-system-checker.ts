@@ -1,9 +1,8 @@
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { Result } from '../result';
 
-type Checker = (
-  parsers: { name: string; result: any }[]
-) => { name: string; result: any } | undefined;
+type Checker = (parsers: { name: string; result: any }[]) => Result | undefined;
 
 const checkIfDevOrProdDependenciesPresent = (
   path: string[],
@@ -30,7 +29,8 @@ const checkIfDevOrProdDependenciesPresent = (
 
 const generateDependenciesRule = (
   packageName: string,
-  devDependencies = false
+  devDependencies = false,
+  replacement?: string
 ): Checker => {
   return (parsers: { name: string; result: any }[]) => {
     const packageManagerConfigurationFilePath = parsers.find(
@@ -50,6 +50,13 @@ const generateDependenciesRule = (
       return;
     }
 
+    if (replacement) {
+      return {
+        name: `has_${packageName}_dependency`,
+        result,
+        message: `You should use ${replacement} instead of ${packageName}`,
+      };
+    }
     return { name: `has_${packageName}_dependency`, result };
   };
 };
@@ -59,6 +66,7 @@ const dependenciesCheck = [
   generateDependenciesRule('underscore'),
   generateDependenciesRule('underscore'),
   generateDependenciesRule('karma', true),
+  generateDependenciesRule('react-scripts', true, 'vite'),
 ];
 
 const npmAudit = (parsers: { name: string; result: any }[]) => {

@@ -1,49 +1,8 @@
 import puppeteer, { Page } from 'puppeteer';
-
-type Checker = (
-  url: string,
-  parsers: { name: string; result: any }[],
-  { urls, page }?: { urls: Set<string>; page: Page }
-) => Promise<{ name: string; message?: string; result: any } | undefined>;
-
-const hasValidDoctype: Checker = async (
-  _url: string,
-  parsers: { name: string; result: any }[],
-  { page }: { page: Page }
-): Promise<{ name: string; result: any; message: string } | undefined> => {
-  const doctype = await page.evaluate(() => {
-    const node = document.doctype;
-    if (node) {
-      return {
-        name: node.name,
-        publicId: node.publicId,
-        systemId: node.systemId,
-      };
-    }
-    return null; // Si pas de doctype
-  });
-
-  if (!doctype) {
-    return Promise.resolve({
-      name: 'hasValidDoctype',
-      result: undefined,
-      message: 'You do not have a doctype',
-    });
-  }
-
-  if (
-    doctype.name !== 'html' ||
-    doctype.publicId !== '' ||
-    doctype.systemId !== ''
-  ) {
-    return Promise.resolve({
-      name: 'hasValidDoctype',
-      result: doctype,
-      message: 'You do not have a valide doctype',
-    });
-  }
-  return Promise.resolve(undefined);
-};
+import { Checker } from './checker';
+import { hasValidDoctype } from './rules/hasValidDoctype';
+import { hasValidElementInsideHead } from './rules/hasValidElementInsideHead';
+import { hasBasicLayoutElement } from './rules/hasBasicLayoutElement';
 
 const hasTitle: Checker = async (
   _url: string,
@@ -148,6 +107,8 @@ export class HttpChecker {
     hasAtLeastOneAnalyticsTools,
     hasTitle,
     hasValidDoctype,
+    hasValidElementInsideHead,
+    hasBasicLayoutElement,
   ];
   constructor(private parsers: { name: string; result: any }[]) {}
   async check(url: string) {
