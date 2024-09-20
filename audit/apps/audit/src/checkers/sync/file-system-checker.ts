@@ -64,8 +64,8 @@ const generateDependenciesRule = (
 const dependenciesCheck = [
   generateDependenciesRule('moment'),
   generateDependenciesRule('underscore'),
-  generateDependenciesRule('underscore'),
-  generateDependenciesRule('karma', true),
+  generateDependenciesRule('lodash'),
+  generateDependenciesRule('karma', true, 'jest'),
   generateDependenciesRule('react-scripts', true, 'vite'),
 ];
 
