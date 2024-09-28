@@ -10,7 +10,7 @@
   "dependencies": {
     "axios": "1.6.7",
     "commander": "^11.1.0",
-    "fdir": "^6.2.0",
+    "fdir": "^6.3.0",
     "puppeteer": "^21.9.0",
     "tslib": "^2.3.0",
     "yaml": "^2.5.0",
