@@ -8,6 +8,7 @@ import { FileSystemParser } from './parsers/file-system-parser';
 import { FileSystemChecker } from './checkers/sync/file-system-checker';
 import { HttpChecker } from './checkers/async/http-system-checker';
 import yoctoSpinner from 'yocto-spinner';
+import logger from './logger';
 
 program.name('audit').version('0.0.0');
 
@@ -41,7 +42,6 @@ program
 
     const fileSystemParser = new FileSystemParser();
     audit.parsers = fileSystemParser.parse('.');
-
     if (!config['only-parser']) {
       const fileSystemChecker = new FileSystemChecker(audit.parsers);
       audit.syncChecks = fileSystemChecker.check();
@@ -52,6 +52,7 @@ program
         try {
           audit.asyncChecks = {};
           for (const url of config.urls) {
+            logger.info(`Starting auditing with async checks: ${url}`);
             audit.asyncChecks[url] = await httpChecker.check(url);
           }
         } catch (e) {
@@ -63,6 +64,5 @@ program
     spinner.success('Success!');
     console.log(JSON.stringify(audit));
   });
-
 
 program.parse();
