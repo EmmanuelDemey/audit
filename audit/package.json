@@ -8,7 +8,7 @@
     "audit": "dist/apps/audit/apps/audit/src/main.js"
   },
   "dependencies": {
-    "axios": "1.6.7",
+    "axios": "1.7.7",
     "commander": "^11.1.0",
     "fdir": "^6.2.0",
     "puppeteer": "^21.9.0",
