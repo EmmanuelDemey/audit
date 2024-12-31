@@ -42,5 +42,6 @@
       "!{projectRoot}/eslint.config.js"
     ],
     "sharedGlobals": []
-  }
+  },
+  "useLegacyCache": true
 }
